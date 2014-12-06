@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package swe.life.objects.enumarations;
+package swe.life.objects.enumerations;
 
 /**
  * The list of different digestions for the @link swe.life.objects.Animal animals}.

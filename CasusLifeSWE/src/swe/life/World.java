@@ -9,21 +9,28 @@ import swe.life.objects.Object;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * The world that contains a list of {@link Object objects} and the {@link History history}.
  * @author Roy
  */
 public class World {
+    private boolean isPaused = false;
+    private int period;
+    private boolean isSimulationRunning = false;
     private List<Object> objects = new ArrayList<>();
     private Timer timer = new Timer();
     
     /**
      * Used to load a scene in the world.
-     * @param scene serialized {@link Object} list
-     * @return if the loading was a success
+     * @param scene A serialized {@link Object} list.
+     * @return If the loading was a success.
      */
     public boolean loadScene(String scene) {
+        if (isSimulationRunning) timer.cancel();
+        reset();
+        
         //TODO implement
     }
     
@@ -46,7 +53,11 @@ public class World {
         if (speed == 0) speed = 0.5;
         else if (speed < 0) speed = -1;
         
-        //TODO implement
+        if (!isPaused) reset();
+        
+        //TODO implement, reset all if not paused
+        
+        return startTimer((int) (speed * 1000));
     }
     
     /**
@@ -54,7 +65,17 @@ public class World {
      * @return If the simulation can be paused, like when its running.
      */
     public boolean pauseSimulation() {
-        
+        isPaused = stopSimulation();
+        return isPaused;
+    }
+    
+    /**
+     * Continues the simulation from pause.
+     * @return If the simulation can be continued, like when its running.
+     */
+    public boolean continueSimulation() {
+        isPaused = !startSimulation(period);
+        return !isPaused;
     }
     
     /**
@@ -62,7 +83,10 @@ public class World {
      * @return If the simulation can be stopped, like when its not running.
      */
     public boolean stopSimulation() {
-        
+        if (!isSimulationRunning) return false;
+        isSimulationRunning = false;
+        if (timer != null) timer.cancel();
+        return true;
     }
     
     /**
@@ -70,14 +94,50 @@ public class World {
      * @return If the simulation can run once, like when its running.
      */
     public boolean runOnceSimulation() {
-        
+        if (isSimulationRunning) return false;
+        startTimer(period);
+        return true;
     }
     
     /**
-     * TODO doc
-     * @return 
+     * Checks if the simulations is running.
+     * @return True when the simulation is running.
      */
     public boolean isSimulationRunning() {
-        
+        return isSimulationRunning;
+    }
+    
+    /**
+     * Starts the timer with the simulation methods.
+     * @param period The time in milliseconds between the task calls.
+     * @return If the timer can be started, like when its not running already.
+     */
+    private boolean startTimer(int period) {
+        this.period = period;
+        if (isSimulationRunning) return false;
+        if (timer == null) timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                throw new UnsupportedOperationException("TODO Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        }, 0, period);
+        return true;
+    }
+    
+    /**
+     * Returns the current speed of the simulation.
+     * @return The speed as a double.
+     */
+    private double getSpeed() {
+        return period / 1000;
+    }
+    
+    /**
+     * Resets the simulation so a new one can start.
+     * @return If the resetting was successful.
+     */
+    private boolean reset() {
+        //TODO implement & doc
     }
 }

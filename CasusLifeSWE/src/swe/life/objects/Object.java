@@ -5,6 +5,7 @@
  */
 package swe.life.objects;
 
+import java.io.Serializable;
 import javafx.scene.paint.Color;
 
 /**
@@ -12,7 +13,7 @@ import javafx.scene.paint.Color;
  * It contains the coordinates of the object as well as the color.
  * @author Roy
  */
-public abstract class Object {
+public abstract class Object implements Serializable {
     private final Integer x;
     private final Integer y;
     private final Color color;
