@@ -11,7 +11,7 @@ package swe.life.objects.enumerations;
  */
 public enum Digestion {
     Herbivorous,
-    Carnivore,
+    Carnivorous,
     OmnivorousPreferMeat,
     OmnivorousPreferVegetation,
 }

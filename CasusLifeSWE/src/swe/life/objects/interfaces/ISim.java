@@ -6,10 +6,10 @@
 package swe.life.objects.interfaces;
 
 /**
- * A interface that is implemented in {@link swe.life.objects.Dynamic 'Living'} classes
+ * A interface that is implemented in {@link swe.life.objects.Living 'Living'} classes.
  * @author Roy
  */
 public interface ISim {
-    public void eaten();
+    public int eaten();
     public void simulate();
 }

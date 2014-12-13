@@ -7,26 +7,56 @@ package swe.life.objects;
 
 import java.io.Serializable;
 import javafx.scene.paint.Color;
+import swe.life.World;
 
 /**
- * The basic object used for objects in the {@link swe.life.World world}. 
+ * The basic object used for objects in the {@link swe.life.World world}.
  * It contains the coordinates of the object as well as the color.
  * @author Roy
  */
 public abstract class Object implements Serializable {
-    private final Integer x;
-    private final Integer y;
-    private final Color color;
+    double x;
+    double y;
+    private Color color;
+    protected World world;
     
     /**
      * The base constructor for a Object.
-     * @param x the X (horizontal) position of the object
-     * @param y the Y (vertical) position of the object
-     * @param color the color of the object
+     * @param x The X (horizontal) position of the object.
+     * @param y The Y (vertical) position of the object.
+     * @param color The color of the object.
+     * @param world The world where the object in exists.
      */
-    public Object(Integer x, Integer y, Color color) {
+    public Object(int x, int y, Color color, World world) {
         this.x = x;
         this.y = y;
         this.color = color;
+        this.world = world;
+        
+        world.addObject(this);
+    }
+    
+    /**
+     * Returns the rounded x position of the object.
+     * @return A integer cast of the x double.
+     */
+    public int getX() {
+        return (int) x;
+    }
+    
+    /**
+     * Returns the rounded y position of the object.
+     * @return A integer cast of the y double.
+     */
+    public int getY() {
+        return (int) y;
+    }
+    
+    /**
+     * Returns the color of the object.
+     * @return See the documentation for the color-table.
+     */
+    public Color getColor() {
+        return color;
     }
 }

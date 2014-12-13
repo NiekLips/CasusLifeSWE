@@ -6,14 +6,15 @@
 package swe.life.objects;
 
 import javafx.scene.paint.Color;
+import swe.life.World;
 import swe.life.objects.interfaces.ISim;
 
 /**
  * A living {@link swe.life.objects.Object Object} in a {@link swe.life.World world}.
  * @author Roy
  */
-public abstract class Dynamic extends Object implements ISim {
-    public Dynamic(Integer x, Integer y, Color color) {
-        super(x, y, color);
+public abstract class Living extends Object implements ISim {
+    public Living(int x, int y, Color color, World world) {
+        super(x, y, color, world);
     }
 }

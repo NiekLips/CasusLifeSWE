@@ -6,14 +6,19 @@
 package swe.life.objects;
 
 import javafx.scene.paint.Color;
+import swe.life.World;
 
 /**
  * This class is regular land in the world that extends the Static class.
  * The land can be walked on by {@link Animal} and {@link Vegetation} can grow on it.
  * @author Roy
  */
-public class Land extends Static {
-    public Land(Integer x, Integer y, Color color) {
-        super(x, y, color);
+public class Land extends Landscape {
+    public Land(int x, int y) {
+        this(x, y, Color.WHITE, null);
+    }
+    
+    private Land(int x, int y, Color color, World world) {
+        super(x, y, color, world);
     }
 }

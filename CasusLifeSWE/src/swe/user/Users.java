@@ -18,7 +18,7 @@ public class Users {
      * @param password The password for the user to log in.
      * @return If the login was successful.
      */
-    public boolean loginUserWithNameAndPassword(String name, String password) {
+    public boolean loginUser(String name, String password) {
         //TODO implement
         return true;
     }

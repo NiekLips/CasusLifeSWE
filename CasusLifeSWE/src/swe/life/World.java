@@ -32,6 +32,7 @@ public class World {
         reset();
         
         //TODO implement
+        return true;
     }
     
     /**
@@ -138,6 +139,26 @@ public class World {
      * @return If the resetting was successful.
      */
     private boolean reset() {
+        if (isSimulationRunning) stopSimulation();
         //TODO implement & doc
+        return true;
+    }
+    
+    /**
+     * Adds a {@link swe.life.objects.Object object} to the objects list.
+     * @param object The object to add to the list.
+     * @return The result of the add.
+     */
+    public boolean addObject(Object object) {
+        return objects.add(object);
+    }
+    
+    /**
+     * Removes a {@link swe.life.objects.Object object} to the objects list.
+     * @param object The object to remove from the list.
+     * @return The result of the remove.
+     */
+    public boolean removeObject(Object object) {
+        return objects.remove(object);
     }
 }

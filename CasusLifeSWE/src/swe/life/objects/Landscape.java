@@ -6,13 +6,14 @@
 package swe.life.objects;
 
 import javafx.scene.paint.Color;
+import swe.life.World;
 
 /**
  * A non-movable non-living {@link Object} in the {@link swe.life.World world}.
  * @author Roy
  */
-public abstract class Static extends Object {
-    public Static(Integer x, Integer y, Color color) {
-        super(x, y, color);
+public abstract class Landscape extends Object {
+    public Landscape(Integer x, Integer y, Color color, World world) {
+        super(x, y, color, world);
     }
 }
