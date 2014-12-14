@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class Statistics {
     /**
-     * Note that a reference Integer is used and not a int.
+     * Note that a reference Integer is used and not a basic int.
      */
     Map<WildLife, Integer> totalCountWildLife;
     Map<WildLife, Integer> totalEnergyWildLife;
