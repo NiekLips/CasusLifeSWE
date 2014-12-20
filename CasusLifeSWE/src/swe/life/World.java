@@ -8,17 +8,49 @@ package swe.life;
 import swe.life.objects.Object;
 import java.util.ArrayList;
 import java.util.List;
+import swe.life.objects.Animal;
+import swe.life.objects.Living;
+import swe.life.objects.Vegetation;
 
 /**
- * The world that contains a list of {@link Object objects} and the {@link History history}.
+ * The world that contains a list of {@link Object objects}, the {@link Simulator simulator} and the {@link History history}.
  * @author Roy
  */
 public class World {
-    private final List<Object> objects = new ArrayList<>();
-    private final Simulator simulator;
+    public final static int LINE_OF_SIGHT = 10;
     
-    public World() {//TODO parameters
-        simulator = new Simulator(this);
+    private int id;
+    private List<Object> mObjects;
+    private final Simulator mSimulator;
+    
+    /**
+     * Creates a world from a ID and the serialized objects from the database.
+     * @param id 
+     * @param objects 
+     */
+    public World(int id, List<Object> objects) {
+        this();
+        
+        this.mObjects = objects;
+        this.id = id;
+    }
+    
+    /**
+     * Creates a new world with the given parameters.
+     * @param todoo 
+     */
+    public World(String todoo) {//TODO parameters for a new world
+        this();
+        
+        this.mObjects = new ArrayList<>();
+        //this.id = id; TODO new ID from DB
+    }
+    
+    /**
+     * Contains the generic initializers for the world class.
+     */
+    private World() {
+        mSimulator = new Simulator(this);
     }
     
     /**
@@ -38,32 +70,60 @@ public class World {
      * @return If the resetting was successful.
      */
     boolean reset() { //TODO check if reset can be called from outside swe.life
-        if (simulator != null && simulator.isSimulationRunning()) simulator.stopSimulation();
+        if (mSimulator != null && mSimulator.isSimulationRunning()) mSimulator.stopSimulation();
         //TODO implement & doc
         return true;
     }
     
     /**
-     * Gets the {@link Object object(s)} on the given x & y.
+     * Returns the objects in the world.
+     * @return A list of all the objects.
+     */
+    public List<Object> getObjects() {
+        return mObjects;
+    }
+    
+    /**
+     * Gets the {@link Object object(s)} on the given x &amp; y.
      * @param x The X location on the grid.
      * @param y The Y location on the grid.
      * @return A list with the object(s), will return a empty list when nothing is found.
      */
     public List<Object> getObjectsForXY(int x, int y) {
-        return null; //TODO
+        List<Object> objects = new ArrayList<>();
+        for (Object object : mObjects) {
+            if (Math.round(object.getX()) == x && Math.round(object.getY()) == y) objects.add(object);
+        }
+        return objects;
     }
     
     /**
      * Gets the nearest {@link Object object} with the requested kind.
-     * TODO check within a distance
-     * @param object The type of object looking for.
+     * Checks also within a distance
+     * TODO check optimizations
+     * @param objectKind The type of object looking for.
      * @param x The X location of the current position.
      * @param y The Y location of the current position.
      * @param crossWater If the object may go over water.
      * @return Multiple objects when they are equally far away.
      */
-    public List<Object> getNearestObjectsKindFrom(Object object, int x, int y, boolean crossWater) {
-        return null; //TODO
+    public Object getNearestObjectKindFrom(Class objectKind, double x, double y, boolean crossWater) {
+        double closest = -1;
+        Object closestObject = null;
+        for (Object object : mObjects) {
+            if (object.getClass() == objectKind) {
+                double cx = Math.pow(x - object.getX(), 2);
+                double cy = Math.pow(y - object.getY(), 2);
+                if (cx + cy < Math.pow(LINE_OF_SIGHT, 2)) {
+                    double distance =  Math.sqrt(cx + cy);
+                    if (distance <= closest || closest == -1) {
+                        //TODO check for water
+                        if (distance < closest) closestObject = object;
+                    }
+                }
+            }
+        }
+        return closestObject;
     }
     
     /**
@@ -77,9 +137,30 @@ public class World {
     /**
      * Returns the current {@link Statistics statistics}.
      * @return A new statistics object with the current data.
+     * @throws java.lang.Exception Will be thrown when a  {@link Living} object is in the mObjects that is not a {@link Animal} or  {@link Vegetation}
      */
-    public Statistics getCurrentStatistics() {
-        return null; //TODO
+    public Statistics getCurrentStatistics() throws Exception {
+        int totalCountOmnivores = 0, totalCountCarnivores = 0, totalCountHerbivores = 0, totalCountVegetation = 0, totalEnergyOmnivores = 0, totalEnergyCarnivores = 0, totalEnergyHerbivores = 0, totalEnergyVegetation = 0;
+        for (Object object : mObjects) {
+            if (object instanceof Living) { //TODO Living instead of Object
+                if (object instanceof Animal) {
+                    Animal animal = (Animal)object;
+                    switch (animal.getDigestion()) {
+                        case Carnivorous: totalCountCarnivores++; totalEnergyCarnivores += animal.getEnergy(); break;
+                        case Herbivorous: totalCountHerbivores++; totalEnergyHerbivores += animal.getEnergy(); break;
+                        default: totalCountOmnivores++; totalEnergyOmnivores += animal.getEnergy(); break;
+                    }
+                }
+                else if (object instanceof Vegetation) {
+                    Vegetation vegetation = (Vegetation)object;
+                    totalCountVegetation++; totalEnergyVegetation += vegetation.getEnergy();
+                }
+                else {
+                    throw new Exception("Unknown instance in getCurrentStatistics");
+                }
+            }
+        }
+        return new Statistics(totalCountOmnivores, totalCountCarnivores, totalCountHerbivores, totalCountVegetation, totalEnergyOmnivores, totalEnergyCarnivores, totalEnergyHerbivores, totalEnergyVegetation);
     }
     
     /**
@@ -88,7 +169,7 @@ public class World {
      * @return The result of the add.
      */
     public boolean addObject(Object object) {
-        return objects.add(object);
+        return mObjects.add(object);
     }
     
     /**
@@ -97,7 +178,7 @@ public class World {
      * @return The result of the remove.
      */
     public boolean removeObject(Object object) {
-        return objects.remove(object);
+        return mObjects.remove(object);
     }
     
     /**
@@ -105,6 +186,6 @@ public class World {
      * @return The simulator that can be controlled.
      */
     public Simulator getSimulator() {
-        return simulator;
+        return mSimulator;
     }
 }

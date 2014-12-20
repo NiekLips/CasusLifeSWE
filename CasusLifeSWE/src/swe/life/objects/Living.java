@@ -14,7 +14,7 @@ import swe.life.objects.interfaces.ISim;
  * @author Roy
  */
 public abstract class Living extends Object implements ISim {
-    public Living(int x, int y, Color color, World world) {
+    public Living(double x, double y, Color color, World world) {
         super(x, y, color, world);
     }
 }

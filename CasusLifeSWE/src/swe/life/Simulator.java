@@ -7,6 +7,7 @@ package swe.life;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import swe.life.objects.Living;
 
 /**
  * Handles the simulation in the {@link World}.
@@ -112,7 +113,11 @@ public class Simulator {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                throw new UnsupportedOperationException("TODO Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                for (Object object : world.getObjects()) { //TODO manage a seperate list with Living objects
+                    if (object instanceof Living) {
+                        ((Living)object).simulate();
+                    }
+                }
             }
         }, 0, period);
         return true;

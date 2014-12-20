@@ -19,18 +19,18 @@ public class Statistics {
     Map<WildLife, Integer> totalCountWildLife;
     Map<WildLife, Integer> totalEnergyWildLife;
 
-    public Statistics(int totalCountOmnivore, int totalCountCarnivore, int totalCountHerbivore, int totalCountVegetation, int totalEnergyOmnivore, int totalEnergyCarnivore, int totalEnergyHerbivore, int totalEnergyVegetation) {
+    public Statistics(int totalCountOmnivores, int totalCountCarnivores, int totalCountHerbivores, int totalCountVegetation, int totalEnergyOmnivores, int totalEnergyCarnivores, int totalEnergyHerbivores, int totalEnergyVegetation) {
         totalCountWildLife = new HashMap<>();
         totalEnergyWildLife = new HashMap<>();
         
-        totalCountWildLife.put(WildLife.Omnivore, totalCountOmnivore);
-        totalCountWildLife.put(WildLife.Carnivore, totalCountCarnivore);
-        totalCountWildLife.put(WildLife.Herbivore, totalCountHerbivore);
+        totalCountWildLife.put(WildLife.Omnivore, totalCountOmnivores);
+        totalCountWildLife.put(WildLife.Carnivore, totalCountCarnivores);
+        totalCountWildLife.put(WildLife.Herbivore, totalCountHerbivores);
         totalCountWildLife.put(WildLife.Vegetation, totalCountVegetation);
         
-        totalEnergyWildLife.put(WildLife.Omnivore, totalEnergyOmnivore);
-        totalEnergyWildLife.put(WildLife.Carnivore, totalEnergyCarnivore);
-        totalEnergyWildLife.put(WildLife.Herbivore, totalEnergyHerbivore);
+        totalEnergyWildLife.put(WildLife.Omnivore, totalEnergyOmnivores);
+        totalEnergyWildLife.put(WildLife.Carnivore, totalEnergyCarnivores);
+        totalEnergyWildLife.put(WildLife.Herbivore, totalEnergyHerbivores);
         totalEnergyWildLife.put(WildLife.Vegetation, totalEnergyVegetation);
     }
     

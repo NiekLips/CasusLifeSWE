@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import swe.life.World;
 import swe.life.objects.enumerations.Digestion;
 import swe.life.objects.enumerations.Direction;
+import swe.life.objects.enumerations.Goal;
 import swe.life.objects.enumerations.Sex;
 
 /**
@@ -17,26 +18,31 @@ import swe.life.objects.enumerations.Sex;
  * @author Roy
  */
 public class Animal extends Living {
+    public static final double REACH = 1;
     public static final int OPTIMAL_NUMBER_OF_LEGS = 5;
     
+    private Activity activity;
     private Direction moveDiretion;
     private Digestion digestion;
     private Sex sex;
     private int energy;
     private int legs;
+    private int mateThreshold; //% of stamina a animal wants to mate
     private int moveThreshold;
-    private int reproductionCosts;
-    private int stamina;
+    private int reproductionCosts; //% of stamina that gets transmitted to the child
+    private int stamina; //Maximum amount of energy
     private int strength;
-    private int swimThreshold;
+    private int swimThreshold; //% of stamina a animal wants to swim
     
-    public Animal(int x, int y, World world, Digestion digestion, Sex sex, int energy, int legs, int moveThreshold, int reproductionCosts, int stamina, int strength, int swimThreshold) {
+    public Animal(double x, double y, World world, Digestion digestion, Sex sex, int energy, int legs, int mateThreshold, int moveThreshold, int reproductionCosts, int stamina, int strength, int swimThreshold) {
         this(x, y, getColorForDigestion(digestion), world);
+        this.activity = new Activity();
         this.moveDiretion = Direction.None;
         this.digestion = digestion;
         this.sex = sex;
         this.energy = energy;
         this.legs = legs;
+        this.mateThreshold = mateThreshold;
         this.moveThreshold = moveThreshold;
         this.reproductionCosts = reproductionCosts;
         this.stamina = stamina;
@@ -59,7 +65,7 @@ public class Animal extends Living {
         return color;
     }
     
-    private Animal(int x, int y, Color color, World world) {
+    private Animal(double x, double y, Color color, World world) {
         super(x, y, color, world);
     }
 
@@ -71,21 +77,157 @@ public class Animal extends Living {
     @Override
     public int eaten() {
         world.removeObject(this);
-        return energy;
+        return energy; //TODO correct this (should be hunter.strength - self.stamina)
     }
 
+    /**
+     * State-machine based on energy.
+     */
     @Override
     public void simulate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        
-        
+        //Find or goto a mate
+        if (energy > mateThreshold) {
+            if (activity.getGoal() != Goal.FindPartner) {
+                activity.setGoal(Goal.FindPartner);
+            }
+            
+            if (activity.getTarget() == null) {
+                activity.setTarget(world.getNearestObjectKindFrom(Animal.class, x, y, false));
+                move();
+            }
+            else { //A potential mate has been found
+                if (isWithinReach(activity.getTarget()))
+                    propagate((Animal)activity.getTarget());
+                else
+                    move();
+            }
+        }
+        //Find or goto a food on land
+        else if (energy > swimThreshold) {
+            if (activity.getGoal() != Goal.FindFood) {
+                activity.setGoal(Goal.FindFood);
+            }
+            
+            if (activity.getTarget() == null) {
+                switch (digestion) {
+                    case Carnivorous: {
+                        activity.setTarget(world.getNearestObjectKindFrom(Animal.class, x, y, false));
+                        break;
+                    }
+                    case Herbivorous: {
+                        activity.setTarget(world.getNearestObjectKindFrom(Vegetation.class, x, y, false));
+                        break;
+                    }
+                    case OmnivorousPreferMeat: {
+                        Object target = world.getNearestObjectKindFrom(Animal.class, x, y, false);
+                        if (target == null) target = world.getNearestObjectKindFrom(Vegetation.class, x, y, false);
+                        activity.setTarget((Living) target);
+                        break;
+                    }
+                    case OmnivorousPreferVegetation: {
+                        Object target = world.getNearestObjectKindFrom(Vegetation.class, x, y, false);
+                        if (target == null) target = world.getNearestObjectKindFrom(Animal.class, x, y, false);
+                        activity.setTarget(target);
+                        break;
+                    }
+                    /*
+                    case OmnivorousNoPreference: {
+                        Object target = world.getNearestObjectKindFrom(Living.class, x, y, true);
+                        activity.setTarget((Living) target);
+                        break;
+                    }
+                    */
+                }
+                
+                move();
+            }
+            else { //A potential meal has been found
+                if (isWithinReach(activity.getTarget()))
+                    eat((Living)activity.getTarget());
+                else
+                    move();
+            }
+        }
+        //Find or goto a food on land and water
+        else if (energy > moveThreshold) {
+            if (activity.getGoal() != Goal.FindFood) {
+                activity.setGoal(Goal.FindFood);
+            }
+            
+            if (activity.getTarget() == null) {
+                switch (digestion) {
+                    case Carnivorous: {
+                        activity.setTarget(world.getNearestObjectKindFrom(Animal.class, x, y, true));
+                        break;
+                    }
+                    case Herbivorous: {
+                        activity.setTarget(world.getNearestObjectKindFrom(Vegetation.class, x, y, true));
+                        break;
+                    }
+                    case OmnivorousPreferMeat: {
+                        Object target = world.getNearestObjectKindFrom(Animal.class, x, y, true);
+                        if (target == null) target = world.getNearestObjectKindFrom(Vegetation.class, x, y, true);
+                        activity.setTarget((Living) target);
+                        break;
+                    }
+                    case OmnivorousPreferVegetation: {
+                        Object target = world.getNearestObjectKindFrom(Vegetation.class, x, y, true);
+                        if (target == null) target = world.getNearestObjectKindFrom(Animal.class, x, y, true);
+                        activity.setTarget(target);
+                        break;
+                    }
+                    /*
+                    case OmnivorousNoPreference: {
+                        Object target = world.getNearestObjectKindFrom(Living.class, x, y, true);
+                        activity.setTarget((Living) target);
+                        break;
+                    }
+                    */
+                }
+            
+                move();
+            }
+            else { //A potential meal has been found
+                if (isWithinReach(activity.getTarget()))
+                    eat((Living)activity.getTarget());
+                else
+                    move();
+            }
+        }
+        //Wait for food to spawn
+        else if (energy > 0) {
+            if (activity.getGoal() != Goal.FindFood) {
+                activity.setGoal(Goal.FindFood);
+            } //TODO re-search at some point
+            
+            if (isWithinReach(activity.getTarget()))
+                eat((Living)activity.getTarget());
+        }
+        //Die
+        else {
+            world.removeObject(this);
+        }
+    }
+    
+    /**
+     * Checks if the object is within reach of eating/mating.
+     * @param object The object to check if its in reach.
+     * @return If the object is within reach.
+     */
+    private boolean isWithinReach(Object object) {
+        double cx = Math.pow(x - object.getX(), 2);
+        double cy = Math.pow(y - object.getY(), 2);
+        return (Math.sqrt(cx + cy) < REACH);
     }
     
     /** Returns the calculated weight of the animal.
      * @return Legs * 10 + (energy-strength)
      */
     public double getWeight() {
-        return (legs * 10 + (energy-strength));
+        if (energy - strength > 0)
+            return (legs * 10 + (energy-strength));
+        else
+            return (legs * 10);
     }
     
     /** Returns the calculated speed of the animal.
@@ -95,19 +237,55 @@ public class Animal extends Living {
         return (1 - (Math.abs(OPTIMAL_NUMBER_OF_LEGS - legs) / 5));
     }
     
-    /** Costs as much energy as the weight of the animal.
-     * 
+    /** Returns the {@link Digestion digestion} of the animal.
+     * @return Digestion.
      */
-    public void move() {
-        //TODO implement
+    public Digestion getDigestion() {
+        return digestion;
+    }
+    
+    /** Returns the energy of the animal.
+     * @return The energy as a int.
+     */
+    public int getEnergy() {
+        return energy;
     }
     
     /**
-     * When the animal eats something.
+     * When the animal propagates with another one, the female will spawn a new Animal bases on their properties.
+     * @param animal The partner.
+     */
+    //public Animal(double x, double y, World world, Digestion digestion, Sex sex, int energy, int legs, int mateThreshold, int moveThreshold, int reproductionCosts, int stamina, int strength, int swimThreshold) {
+    
+    public void propagate(Animal animal) {
+        if (sex == Sex.Female) {
+            //TODO implement random values from the parents
+            Animal child = new Animal(x, y, world, digestion, sex, energy, legs, mateThreshold, moveThreshold, reproductionCosts, stamina, strength, swimThreshold);
+        }
+    }
+    
+    /**
+     * Costs as much energy as the weight of the animal.
+     */
+    public void move() {
+        if (activity.getTarget() != null) {
+            double deltaX = activity.getTarget().getX() - x;
+            double deltaY = activity.getTarget().getY() - y;
+            double direction = Math.atan(deltaY / deltaX);
+            x += (getSpeed() * Math.cos(direction));
+            y += (getSpeed() * Math.sin(direction));
+        }
+        else {
+            //TODO move in a search direction
+        }
+        energy -= getWeight();
+    }
+    
+    /** When the animal eats something.
      * @param living The {@link Animal} or {@link Vegetation} that gets eaten.
      */
     public void eat(Living living) {
         energy += living.eaten();
-        //TODO implement
+        if (energy > stamina) energy = stamina;
     }
 }

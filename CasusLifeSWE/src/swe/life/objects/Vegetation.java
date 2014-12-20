@@ -31,6 +31,13 @@ public class Vegetation extends Living {
     private Vegetation(int x, int y, Color color, World world) {
         super(x, y, color, world);
     }
+    
+    /** Returns the energy of the vegetation.
+     * @return The energy as a int.
+     */
+    public int getEnergy() {
+        return energy;
+    }
 
     /** Returns the energy eaten.
      * Plants can be eaten {@value #TIMES_EATEN_BEFORE_DEAD} before being dead at 0 energy.

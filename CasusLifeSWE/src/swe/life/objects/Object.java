@@ -27,7 +27,7 @@ public abstract class Object implements Serializable {
      * @param color The color of the object.
      * @param world The world where the object in exists.
      */
-    public Object(int x, int y, Color color, World world) {
+    public Object(double x, double y, Color color, World world) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -40,16 +40,16 @@ public abstract class Object implements Serializable {
      * Returns the rounded x position of the object.
      * @return A integer cast of the x double.
      */
-    public int getX() {
-        return (int) x;
+    public double getX() {
+        return x;
     }
     
     /**
      * Returns the rounded y position of the object.
      * @return A integer cast of the y double.
      */
-    public int getY() {
-        return (int) y;
+    public double getY() {
+        return y;
     }
     
     /**
