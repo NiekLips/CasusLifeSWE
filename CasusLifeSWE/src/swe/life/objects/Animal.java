@@ -5,6 +5,7 @@
  */
 package swe.life.objects;
 
+import java.util.Random;
 import javafx.scene.paint.Color;
 import swe.life.World;
 import swe.life.objects.enumerations.Digestion;
@@ -259,7 +260,8 @@ public class Animal extends Living {
     
     public void propagate(Animal animal) {
         if (sex == Sex.Female) {
-            //TODO implement random values from the parents
+            Random random = new Random();
+            //TODO implement random values from the parents random.nextBoolean();
             Animal child = new Animal(x, y, world, digestion, sex, energy, legs, mateThreshold, moveThreshold, reproductionCosts, stamina, strength, swimThreshold);
         }
     }
