@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import swe.life.Statistics;
+import swe.life.WildLife;
 
 /**
  * Contains the methods for querying the database.
@@ -72,26 +74,28 @@ public class Database {
             rs.close();
             
             String sql;
-            if (!existingTables.contains("Simulation")) {
-                sql = "CREATE TABLE `Simulation` (\n" +
-                        "	`SimulationID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n" +
-                        "	`TotalCountOmnivore`	INTEGER,\n" +
-                        "	`TotalCountHerbivore`	INTEGER,\n" +
-                        "	`TotalCountCarnivore`	INTEGER,\n" +
-                        "	`TotalCountVegetation`	INTEGER,\n" +
-                        "	`TotalEnergyOmnivore`	INTEGER,\n" +
-                        "	`TotalEnergyHerbivore`	INTEGER,\n" +
-                        "	`TotalEnergyCarnivore`	INTEGER,\n" +
-                        "	`TotalEnergyVegetation`	INTEGER\n" +
+            if (!existingTables.contains("Simulations")) {
+                sql = "CREATE TABLE `Statistics` (\n" +
+                        "	`ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n" +
                         ");";
                 stmt.executeUpdate(sql);
                 System.out.println("Table Simulation created successfully");
             }
+            if (!existingTables.contains("Statistics")) {
+                sql = "CREATE TABLE `Statistics` (\n" +
+                        "	`SimulationID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n" +
+                        "	`TotalCount`	INTEGER,\n" +
+                        "	`TotalEnergy`	INTEGER,\n" +
+                        "	`WildLife`	INTEGER,\n" +
+                        ");";
+                stmt.executeUpdate(sql);
+                System.out.println("Table Statistics created successfully");
+            }
             if (!existingTables.contains("History")) {
                 sql = "CREATE TABLE `History` (\n" +
-                        "	`SimulationID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n" +
-                        "	`SimulationStep`	INTEGER NOT NULL,\n" +
-                        "	`Data`	BLOB NOT NULL\n" +
+                        "	`SimulationID`	INTEGER NOT NULL,\n" +
+                        "	`SimulationStep`INTEGER NOT NULL,\n" +
+                        "	`Data`          BLOB NOT NULL\n" +
                         ");";
                 stmt.executeUpdate(sql);
                 System.out.println("Table History created successfully");
@@ -219,5 +223,109 @@ public class Database {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
         }
         return "";
+    }
+    
+    /**
+     * Saves the {@link swe.life.Statistics statistics} given.
+     * @param simulationID The simulation ID of the statistics.
+     * @param statistics The statistics to save.
+     * @return A boolean if the saving was successful.
+     * @throws SQLException Will be thrown when a error with the database or SQL happens.
+     */
+    public static boolean SaveStatistics(int simulationID, Statistics statistics) throws SQLException {
+        WildLife wildLife;
+        String sql = "INSERT INTO Statistics VALUES (?,?,?,?)";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            wildLife = WildLife.Carnivore;
+            stmt.setInt(0, simulationID);
+            stmt.setInt(1, statistics.getTotalCount(wildLife));
+            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(3, WildLife.toInteger(wildLife));
+            if (stmt.executeUpdate() == 0) return false; //TODO test if this works
+            
+            wildLife = WildLife.Herbivore;
+            stmt.setInt(0, simulationID);
+            stmt.setInt(1, statistics.getTotalCount(wildLife));
+            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(3, WildLife.toInteger(wildLife));
+            if (stmt.executeUpdate() == 0) return false;
+            
+            wildLife = WildLife.Omnivore;
+            stmt.setInt(0, simulationID);
+            stmt.setInt(1, statistics.getTotalCount(wildLife));
+            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(3, WildLife.toInteger(wildLife));
+            if (stmt.executeUpdate() == 0) return false;
+            
+            wildLife = WildLife.Vegetation;
+            stmt.setInt(0, simulationID);
+            stmt.setInt(1, statistics.getTotalCount(wildLife));
+            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(3, WildLife.toInteger(wildLife));
+            if (stmt.executeUpdate() == 0) return false;
+            
+            return true;
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Get the start {@link swe.life.Statistics statistics} for the given simulation ID.
+     * @param simulationID The ID to retrieve the statistics from.
+     * @return The statistics for the ID, will return null if none found.
+     * @throws SQLException Will be thrown when a error with the database or SQL happens.
+     */
+    public static Statistics GetStatistics(int simulationID) throws SQLException {
+        String sql = "SELECT TotalCount, TotalEnergy, WildLife FROM Statistics WHERE SimulationID = ?";
+        Statistics statistics = null;
+        
+        ResultSet rs = null;
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(0, simulationID);
+            
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                if (statistics == null) statistics = new Statistics();
+                WildLife wildLife = WildLife.fromInteger(rs.getObject("WildLife", Integer.class));
+                statistics.setTotalCount(wildLife, rs.getObject("TotalCount", Integer.class));
+                statistics.setTotalEnergy(wildLife, rs.getObject("TotalEnergy", Integer.class));
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            if (rs != null) rs.close();
+        }
+        return statistics;
+    }
+    
+    /**
+     * Creates a new simulation and returns its ID.
+     * @return The new ID of the simulation, returns -1 on fail.
+     * @throws SQLException Will be thrown when a error with the database or SQL happens.
+     */
+    public static int createSimulation() throws SQLException {
+        String sql = "INSERT INTO Simulation VALUES ()";
+        
+        int id = -1;
+        ResultSet rs = null;
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.execute();
+            
+            sql = "SELECT MAX(ID) FROM Simulation";
+            rs = stmt.executeQuery(sql);
+            
+            if (rs.first()) id = rs.getObject(1, Integer.class);
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            if (rs != null) rs.close();
+        }
+        return id;
     }
 }

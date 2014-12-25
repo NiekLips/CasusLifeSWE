@@ -20,8 +20,7 @@ public class Statistics {
     Map<WildLife, Integer> totalEnergyWildLife;
 
     public Statistics(int totalCountOmnivores, int totalCountCarnivores, int totalCountHerbivores, int totalCountVegetation, int totalEnergyOmnivores, int totalEnergyCarnivores, int totalEnergyHerbivores, int totalEnergyVegetation) {
-        totalCountWildLife = new HashMap<>();
-        totalEnergyWildLife = new HashMap<>();
+        this();
         
         totalCountWildLife.put(WildLife.Omnivore, totalCountOmnivores);
         totalCountWildLife.put(WildLife.Carnivore, totalCountCarnivores);
@@ -33,9 +32,14 @@ public class Statistics {
         totalEnergyWildLife.put(WildLife.Herbivore, totalEnergyHerbivores);
         totalEnergyWildLife.put(WildLife.Vegetation, totalEnergyVegetation);
     }
+
+    public Statistics() {
+        totalCountWildLife = new HashMap<>();
+        totalEnergyWildLife = new HashMap<>();
+    }
     
     /**
-     * Gets the total count of the given {@link WildLife}.
+     * Get the total count of the given {@link WildLife}.
      * @param wildLife The requested type.
      * @return A int with the total.
      */
@@ -44,12 +48,30 @@ public class Statistics {
     }
     
     /**
-     * Gets the total energy of the given {@link WildLife}.
+     * Get the total energy of the given {@link WildLife}.
      * @param wildLife The requested type.
      * @return A int with the total.
      */
     public int getTotalEnergy(WildLife wildLife) {
         return totalEnergyWildLife.get(wildLife);
+    }
+    
+    /**
+     * Set the total count of the given {@link WildLife} if not put yet.
+     * @param wildLife The type to set.
+     * @param count The amount int to set.
+     */
+    public void setTotalCount(WildLife wildLife, int count) {
+        totalCountWildLife.putIfAbsent(wildLife, count);
+    }
+    
+    /**
+     * Set the total energy of the given {@link WildLife} if not put yet.
+     * @param wildLife The type to set.
+     * @param energy The energy int to set.
+     */
+    public void setTotalEnergy(WildLife wildLife, int energy) {
+        totalEnergyWildLife.putIfAbsent(wildLife, energy);
     }
     
     /**
