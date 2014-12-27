@@ -17,15 +17,18 @@ public class Users {
     private static User cUser;
     
     /**
-     * Used to log in a user with the credentials.
+     * Used to log in a user with the credentials, a previous logged in user will be set to null.
      * @param name The name for the user to log in.
      * @param password The password for the user to log in.
      * @return If the login was successful.
      * @throws Exception Thrown when a SQL Exception happened.
      */
     public static boolean loginUser(String name, String password) throws Exception {
+        cUser = null;
         try {
-            if (Database.UserExists(name, password)) {
+            int id = Database.userExists(name, password);
+            if (id > -1) {
+                cUser = Database.userForID(id);
                 return true;
             }
         } catch (Exception ex) {
@@ -33,6 +36,13 @@ public class Users {
             throw new Exception(ex.getMessage());
         }
         return false;
+    }
+    
+    /**
+     * Set the current {@link User user} to null.
+     */
+    public static void loginUser() {
+        cUser = null;
     }
     
     /**
@@ -48,10 +58,10 @@ public class Users {
         if (name.length() < 2) throw new Exception("Username should be at least 2 characters!");
         if (password.length() < 6) throw new Exception("Password should be at least 6 characters!");
         
-        if (Database.UserExists(name)) throw new Exception("Username already exists in the database.");
+        if (Database.userExists(name)) throw new Exception("Username already exists in the database.");
         
         try {
-            if (Database.CreateUser(name, password, UserRights.toInteger(rights))) {
+            if (Database.createUser(name, password, UserRights.toInteger(rights))) {
                 return true;
             }
         } catch (Exception ex) {
@@ -73,7 +83,7 @@ public class Users {
         if (newPassword.length() < 6) throw new Exception("New password should be at least 6 characters!");
         
         try {
-            if (Database.ChangePassword(cUser.getID(), oldPassword, newPassword)) {
+            if (Database.changePassword(cUser.getID(), oldPassword, newPassword)) {
                 return true;
             }
         } catch (Exception ex) {

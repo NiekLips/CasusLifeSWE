@@ -22,6 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import swe.life.Statistics;
 import swe.life.WildLife;
+import swe.user.User;
+import swe.user.UserRights;
 
 /**
  * Contains the methods for querying the database.
@@ -67,11 +69,11 @@ public class Database {
         try (Statement stmt = connection.createStatement()) {
             List<String> existingTables = new ArrayList<>();
             DatabaseMetaData md = connection.getMetaData();
-            ResultSet rs = md.getTables(null, null, "%", null);
-            while (rs.next()) {
-                existingTables.add(rs.getString(3));
+            try (ResultSet rs = md.getTables(null, null, "%", null)) {
+                while (rs.next()) {
+                    existingTables.add(rs.getString(3));
+                }
             }
-            rs.close();
             
             String sql;
             if (!existingTables.contains("Simulations")) {
@@ -124,31 +126,31 @@ public class Database {
      * @return If the user exists with the name.
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
-    public static boolean UserExists(String name) throws SQLException {
-        return UserExists(name, null);
+    public static boolean userExists(String name) throws SQLException {
+        return (userExists(name, null) > -1);
     }
     
     /**
-     * Checks if a user with name &amp; password exists in the database.
+     * Checks if a user with name &amp; password exists in the database and returns the id.
      * @param name The name for the user to search.
      * @param password The password for the user to search, when null, do not search with password.
-     * @return If the user exists with the name and optional password.
+     * @return The id of the user if it exists, else -1.
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
-    public static boolean UserExists(String name, String password) throws SQLException {
-        String sql = "SELECT COUNT(UserID) FROM Users WHERE lower(UserName) = lower(?)";
+    public static int userExists(String name, String password) throws SQLException {
+        String sql = "SELECT UserID FROM Users WHERE lower(UserName) = lower(?)";
         if (password != null) sql += " and Password = ?";
         sql += ";";
         
-        boolean exists = false;
+        int id = -1;
         ResultSet rs = null;
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(0, name);
-            if (password != null) stmt.setString(1, stringToSHA512String(password));
+            stmt.setString(1, name);
+            if (password != null) stmt.setString(2, stringToSHA512String(password));
  
             rs = stmt.executeQuery();
             while (rs.next()) {
-                exists = (rs.getInt(1) > 0);
+                id = rs.getInt(1);
             }
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -156,7 +158,7 @@ public class Database {
         } finally {
             if (rs != null) rs.close();
         }
-        return exists;
+        return id;
     }
     
     /**
@@ -167,19 +169,46 @@ public class Database {
      * @return If the creation was a success.
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
-    public static boolean CreateUser(String name, String password, int rights) throws SQLException {
+    public static boolean createUser(String name, String password, int rights) throws SQLException {
         String sql = "INSERT INTO Users (UserName, Password, UserRights) VALUES (?,?,?)";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(0, name);
-            stmt.setString(1, stringToSHA512String(password));
-            stmt.setInt(2, rights);
+            stmt.setString(1, name);
+            stmt.setString(2, stringToSHA512String(password));
+            stmt.setInt(3, rights);
  
             return (stmt.executeUpdate() > 0); //TODO test if this works
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
         }
+    }
+    
+    /**
+     * Gets the user for the given ID.
+     * @param id The ID of the user.
+     * @return A {@link User} object.
+     * @throws SQLException Will be thrown when a error with the database or SQL happens.
+     */
+    public static User userForID(int id) throws SQLException {
+        String sql = "SELECT UserID, UserName, UserRights FROM Users WHERE UserID = ?;";
+        
+        User u = null;
+        ResultSet rs = null;
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+ 
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                u = new User(rs.getInt(1), rs.getString(2), UserRights.fromInteger(rs.getInt(3)));
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            if (rs != null) rs.close();
+        }
+        return u;
     }
     
     /**
@@ -190,13 +219,13 @@ public class Database {
      * @return If the password changing was successful.
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
-    public static boolean ChangePassword(int userID, String oldPassword, String newPassword) throws SQLException {
+    public static boolean changePassword(int userID, String oldPassword, String newPassword) throws SQLException {
         String sql = "UPDATE Users SET Password = ? WHERE UserID = ? AND Password = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(0, stringToSHA512String(newPassword));
-            stmt.setInt(1, userID);
-            stmt.setString(2, stringToSHA512String(oldPassword));
+            stmt.setString(1, stringToSHA512String(newPassword));
+            stmt.setInt(2, userID);
+            stmt.setString(3, stringToSHA512String(oldPassword));
  
             return (stmt.executeUpdate() > 0);
         } catch (SQLException e) {
@@ -232,37 +261,37 @@ public class Database {
      * @return A boolean if the saving was successful.
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
-    public static boolean SaveStatistics(int simulationID, Statistics statistics) throws SQLException {
+    public static boolean saveStatistics(int simulationID, Statistics statistics) throws SQLException {
         WildLife wildLife;
         String sql = "INSERT INTO Statistics VALUES (?,?,?,?)";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             wildLife = WildLife.Carnivore;
-            stmt.setInt(0, simulationID);
-            stmt.setInt(1, statistics.getTotalCount(wildLife));
-            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
-            stmt.setInt(3, WildLife.toInteger(wildLife));
+            stmt.setInt(1, simulationID);
+            stmt.setInt(2, statistics.getTotalCount(wildLife));
+            stmt.setInt(3, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(4, WildLife.toInteger(wildLife));
             if (stmt.executeUpdate() == 0) return false; //TODO test if this works
             
             wildLife = WildLife.Herbivore;
-            stmt.setInt(0, simulationID);
-            stmt.setInt(1, statistics.getTotalCount(wildLife));
-            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
-            stmt.setInt(3, WildLife.toInteger(wildLife));
+            stmt.setInt(1, simulationID);
+            stmt.setInt(2, statistics.getTotalCount(wildLife));
+            stmt.setInt(3, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(4, WildLife.toInteger(wildLife));
             if (stmt.executeUpdate() == 0) return false;
             
             wildLife = WildLife.Omnivore;
-            stmt.setInt(0, simulationID);
-            stmt.setInt(1, statistics.getTotalCount(wildLife));
-            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
-            stmt.setInt(3, WildLife.toInteger(wildLife));
+            stmt.setInt(1, simulationID);
+            stmt.setInt(2, statistics.getTotalCount(wildLife));
+            stmt.setInt(3, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(4, WildLife.toInteger(wildLife));
             if (stmt.executeUpdate() == 0) return false;
             
             wildLife = WildLife.Vegetation;
-            stmt.setInt(0, simulationID);
-            stmt.setInt(1, statistics.getTotalCount(wildLife));
-            stmt.setInt(2, statistics.getTotalEnergy(wildLife));
-            stmt.setInt(3, WildLife.toInteger(wildLife));
+            stmt.setInt(1, simulationID);
+            stmt.setInt(2, statistics.getTotalCount(wildLife));
+            stmt.setInt(3, statistics.getTotalEnergy(wildLife));
+            stmt.setInt(4, WildLife.toInteger(wildLife));
             if (stmt.executeUpdate() == 0) return false;
             
             return true;
@@ -278,13 +307,13 @@ public class Database {
      * @return The statistics for the ID, will return null if none found.
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
-    public static Statistics GetStatistics(int simulationID) throws SQLException {
+    public static Statistics getStatistics(int simulationID) throws SQLException {
         String sql = "SELECT TotalCount, TotalEnergy, WildLife FROM Statistics WHERE SimulationID = ?";
         Statistics statistics = null;
         
         ResultSet rs = null;
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(0, simulationID);
+            stmt.setInt(1, simulationID);
             
             rs = stmt.executeQuery();
             
