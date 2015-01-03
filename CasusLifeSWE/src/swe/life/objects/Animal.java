@@ -252,22 +252,92 @@ public class Animal extends Living {
         return energy;
     }
     
+    /** Returns the amount of legs of the animal.
+     * @return The legs as a int.
+     */
+    public int getLegs() {
+        return legs;
+    }
+    
+    /** Returns the mate threshold of the animal.
+     * @return The mate threshold as a int.
+     */
+    public int getMateThreshold() {
+        return mateThreshold;
+    }
+    
+    /** Returns the move threshold of the animal.
+     * @return The move threshold as a int.
+     */
+    public int getMoveThreshold() {
+        return moveThreshold;
+    }
+    
+    /** Returns the reproduction costs of the animal.
+     * @return The reproduction costs as a int.
+     */
+    public int getReproductionCosts() {
+        return reproductionCosts;
+    }
+    
+    /** Returns the stamina of the animal.
+     * @return The stamina as a int.
+     */
+    public int getStamina() {
+        return stamina;
+    }
+    
+    /** Returns the strength of the animal.
+     * @return The strength as a int.
+     */
+    public int getStrength() {
+        return strength;
+    }
+    
+    /** Returns the swim threshold of the animal.
+     * @return The swim threshold as a int.
+     */
+    public int getSwimThreshold() {
+        return swimThreshold;
+    }
+    
     /**
      * When the animal propagates with another one, the female will spawn a new Animal bases on their properties.
      * @param animal The partner.
      */
-    //public Animal(double x, double y, World world, Digestion digestion, Sex sex, int energy, int legs, int mateThreshold, int moveThreshold, int reproductionCosts, int stamina, int strength, int swimThreshold) {
-    
     public void propagate(Animal animal) {
         if (sex == Sex.Female) {
             Random random = new Random();
-            //TODO implement random values from the parents random.nextBoolean();
-            Animal child = new Animal(x, y, world, digestion, sex, energy, legs, mateThreshold, moveThreshold, reproductionCosts, stamina, strength, swimThreshold);
+            Digestion lDigestion = (random.nextBoolean() ? animal.getDigestion() : getDigestion());
+            Sex lSex = (random.nextBoolean() ? Sex.Male : Sex.Female);
+            int lEnergy = getPropagateValue(animal.getEnergy(), getEnergy(), random);
+            int lLegs = getPropagateValue(animal.getLegs(), getLegs(), random);
+            int lMateThreshold = getPropagateValue(animal.getMateThreshold(), getMateThreshold(), random);
+            int lMoveThreshold = getPropagateValue(animal.getMoveThreshold(), getMoveThreshold(), random);
+            int lReproductionCosts = getPropagateValue(animal.getReproductionCosts(), getReproductionCosts(), random);
+            int lStamina = getPropagateValue(animal.getStamina(), getStamina(), random);
+            int lStrength = getPropagateValue(animal.getStrength(), getStrength(), random);
+            int lSwimThreshold = getPropagateValue(animal.getStrength(), getStrength(), random);
+            Animal child = new Animal(x, y, world, lDigestion, lSex, lEnergy, lLegs, lMateThreshold, lMoveThreshold, lReproductionCosts, lStamina, lStrength, lSwimThreshold);
         }
     }
     
     /**
+     * Returns the average value of the maleValue & femaleValue with a maximum difference of 10%.
+     * @param maleValue The value of the male animal.
+     * @param femaleValue The value of the female animal.
+     * @param random The Random so it doesn't have to be created every time.
+     * @return A double casted to int.
+     */
+    private int getPropagateValue(double maleValue, double femaleValue, Random random) {
+        double average = (maleValue + femaleValue / 2);
+        return (int) average * (1 + ((random.nextInt(20) - 10) / 100));
+    }
+    
+    /**
+     * If the activity has a target it will move towards the target, else it will wander in a searching direction.
      * Costs as much energy as the weight of the animal.
+     * TODO collision with obstacles, animals and water
      */
     public void move() {
         if (activity.getTarget() != null) {

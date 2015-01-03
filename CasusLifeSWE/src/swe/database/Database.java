@@ -112,6 +112,8 @@ public class Database {
                 stmt.executeUpdate(sql);
                 System.out.println("Table Users created successfully");
             }
+            stmt.close();
+            connection.commit();
                 
             return true;
         } catch (SQLException e) {
@@ -171,17 +173,22 @@ public class Database {
      */
     public static boolean createUser(String name, String password, int rights) throws SQLException {
         String sql = "INSERT INTO Users (UserName, Password, UserRights) VALUES (?,?,?)";
+        boolean succes = false;
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, name);
             stmt.setString(2, stringToSHA512String(password));
             stmt.setInt(3, rights);
  
-            return (stmt.executeUpdate() > 0); //TODO test if this works
+            succes = (stmt.executeUpdate() > 0);
+            
+            stmt.close();
+            connection.commit();
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
         }
+        return succes;
     }
     
     /**
@@ -221,17 +228,22 @@ public class Database {
      */
     public static boolean changePassword(int userID, String oldPassword, String newPassword) throws SQLException {
         String sql = "UPDATE Users SET Password = ? WHERE UserID = ? AND Password = ?";
+        boolean succes = false;
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, stringToSHA512String(newPassword));
             stmt.setInt(2, userID);
             stmt.setString(3, stringToSHA512String(oldPassword));
  
-            return (stmt.executeUpdate() > 0);
+            succes = (stmt.executeUpdate() > 0);
+            
+            stmt.close();
+            connection.commit();
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
         }
+        return succes;
     }
     
     /**
@@ -294,6 +306,8 @@ public class Database {
             stmt.setInt(4, WildLife.toInteger(wildLife));
             if (stmt.executeUpdate() == 0) return false;
             
+            stmt.close();
+            connection.commit();
             return true;
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -344,6 +358,7 @@ public class Database {
         ResultSet rs = null;
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.execute();
+            connection.commit();
             
             sql = "SELECT MAX(ID) FROM Simulation";
             rs = stmt.executeQuery(sql);
