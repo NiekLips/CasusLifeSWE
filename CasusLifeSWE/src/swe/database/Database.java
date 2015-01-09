@@ -7,7 +7,6 @@ package swe.database;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -72,35 +71,44 @@ public class Database {
             try (ResultSet rs = md.getTables(null, null, "%", null)) {
                 while (rs.next()) {
                     existingTables.add(rs.getString(3));
+                    System.out.println("Database table found: " + rs.getString(3));
                 }
             }
             
             String sql;
             if (!existingTables.contains("Simulations")) {
-                sql = "CREATE TABLE `Statistics` (\n" +
-                        "	`ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n" +
+                sql = "CREATE TABLE `Simulations` (\n" +
+                        "	`ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE\n" +
                         ");";
-                stmt.executeUpdate(sql);
-                System.out.println("Table Simulation created successfully");
+                if (stmt.execute(sql))
+                    System.out.println("Table Simulations created successfully");
+                else
+                    System.out.println("Failed to create table Simulations");
             }
             if (!existingTables.contains("Statistics")) {
                 sql = "CREATE TABLE `Statistics` (\n" +
-                        "	`SimulationID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n" +
+                        "	`SimulationID`	INTEGER NOT NULL,\n" +
                         "	`TotalCount`	INTEGER,\n" +
                         "	`TotalEnergy`	INTEGER,\n" +
-                        "	`WildLife`	INTEGER,\n" +
+                        "	`WildLife`	INTEGER\n" +
                         ");";
-                stmt.executeUpdate(sql);
-                System.out.println("Table Statistics created successfully");
+                if (stmt.execute(sql))
+                    System.out.println("Table Statistics created successfully");
+                else
+                    System.out.println("Failed to create table Statistics");
             }
             if (!existingTables.contains("History")) {
                 sql = "CREATE TABLE `History` (\n" +
                         "	`SimulationID`	INTEGER NOT NULL,\n" +
                         "	`SimulationStep`INTEGER NOT NULL,\n" +
+                        "	`Width`         INTEGER NOT NULL,\n" +
+                        "	`Height`        INTEGER NOT NULL,\n" +
                         "	`Data`          BLOB NOT NULL\n" +
                         ");";
-                stmt.executeUpdate(sql);
-                System.out.println("Table History created successfully");
+                if (stmt.execute(sql))
+                    System.out.println("Table History created successfully");
+                else
+                    System.out.println("Failed to create table History");
             }
             if (!existingTables.contains("Users")) {
                 sql = "CREATE TABLE `Users` (\n" +
@@ -109,11 +117,12 @@ public class Database {
                         "	`Password`	TEXT NOT NULL,\n" +
                         "	`UserRights`	INTEGER\n" +
                         ");";
-                stmt.executeUpdate(sql);
-                System.out.println("Table Users created successfully");
+                if (stmt.execute(sql))
+                    System.out.println("Table Users created successfully");
+                else
+                    System.out.println("Failed to create table Users");
             }
             stmt.close();
-            connection.commit();
                 
             return true;
         } catch (SQLException e) {
@@ -183,7 +192,6 @@ public class Database {
             succes = (stmt.executeUpdate() > 0);
             
             stmt.close();
-            connection.commit();
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
@@ -198,7 +206,7 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static User userForID(int id) throws SQLException {
-        String sql = "SELECT UserID, UserName, UserRights FROM Users WHERE UserID = ?;";
+        String sql = "SELECT UserID, UserName, UserRights FROM Users WHERE UserID = ?";
         
         User u = null;
         ResultSet rs = null;
@@ -238,7 +246,6 @@ public class Database {
             succes = (stmt.executeUpdate() > 0);
             
             stmt.close();
-            connection.commit();
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             throw new SQLException(e.getClass().getName() + ": " + e.getMessage());
@@ -257,10 +264,10 @@ public class Database {
         str = "!|01-K+3OK,o" + str + "DJSF*(OUJ#MFE";
         
         try {
-            MessageDigest mda = MessageDigest.getInstance("SHA-512", "BC");
+            MessageDigest mda = MessageDigest.getInstance("SHA-512");
             byte [] digesta = mda.digest(str.getBytes());
             return Arrays.toString(digesta);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
         }
         return "";
@@ -307,7 +314,6 @@ public class Database {
             if (stmt.executeUpdate() == 0) return false;
             
             stmt.close();
-            connection.commit();
             return true;
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -333,9 +339,9 @@ public class Database {
             
             while (rs.next()) {
                 if (statistics == null) statistics = new Statistics();
-                WildLife wildLife = WildLife.fromInteger(rs.getObject("WildLife", Integer.class));
-                statistics.setTotalCount(wildLife, rs.getObject("TotalCount", Integer.class));
-                statistics.setTotalEnergy(wildLife, rs.getObject("TotalEnergy", Integer.class));
+                WildLife wildLife = WildLife.fromInteger(rs.getInt("WildLife"));
+                statistics.setTotalCount(wildLife, rs.getInt("TotalCount"));
+                statistics.setTotalEnergy(wildLife, rs.getInt("TotalEnergy"));
             }
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -352,18 +358,16 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static int createSimulation() throws SQLException {
-        String sql = "INSERT INTO Simulation VALUES ()";
+        String sql = "INSERT INTO Simulations DEFAULT VALUES";
         
         int id = -1;
         ResultSet rs = null;
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.execute();
-            connection.commit();
-            
-            sql = "SELECT MAX(ID) FROM Simulation";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+            sql = "SELECT MAX(ID) FROM Simulations";
             rs = stmt.executeQuery(sql);
             
-            if (rs.first()) id = rs.getObject(1, Integer.class);
+            if (rs.next()) id = rs.getInt(1);
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             throw new SQLException(e.getClass().getName() + ": " + e.getMessage());

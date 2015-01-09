@@ -20,6 +20,8 @@ public class World {
     public final static int LINE_OF_SIGHT = 10;
     
     private int id;
+    private int width;
+    private int height;
     private List<Object> mObjects;
     private final Simulator mSimulator;
     
@@ -29,7 +31,7 @@ public class World {
      * @param objects 
      */
     public World(int id, List<Object> objects) {
-        this();
+        this(0,0);//TODO load world from db
         
         this.mObjects = objects;
         this.id = id;
@@ -37,10 +39,12 @@ public class World {
     
     /**
      * Creates a new world with the given parameters.
+     * @param width The width of the world.
+     * @param height The height of the world.
      * @param todoo 
      */
-    public World(String todoo) {//TODO parameters for a new world
-        this();
+    public World(int width, int height, String todoo) {//TODO parameters for a new world
+        this(width, height);
         
         this.mObjects = new ArrayList<>();
         //this.id = id; TODO new ID from DB
@@ -48,8 +52,13 @@ public class World {
     
     /**
      * Contains the generic initializers for the world class.
+     * @param width The width of the world.
+     * @param height The height of the world.
      */
-    private World() {
+    private World(int width, int height) {
+        this.width = width;
+        this.height = height;
+        
         mSimulator = new Simulator(this);
     }
     
@@ -161,6 +170,22 @@ public class World {
             }
         }
         return new Statistics(totalCountOmnivores, totalCountCarnivores, totalCountHerbivores, totalCountVegetation, totalEnergyOmnivores, totalEnergyCarnivores, totalEnergyHerbivores, totalEnergyVegetation);
+    }
+    
+    /**
+     * Returns the width of the world.
+     * @return The width as a int.
+     */
+    public int getWidth() {
+        return width;
+    }
+    
+    /**
+     * Returns the height of the world.
+     * @return The height as a int.
+     */
+    public int getHeight() {
+        return height;
     }
     
     /**

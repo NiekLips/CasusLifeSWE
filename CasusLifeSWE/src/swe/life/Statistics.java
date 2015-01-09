@@ -44,7 +44,10 @@ public class Statistics {
      * @return A int with the total.
      */
     public int getTotalCount(WildLife wildLife) {
-        return totalCountWildLife.get(wildLife);
+        if (totalCountWildLife.containsKey(wildLife))
+            return totalCountWildLife.get(wildLife);
+        else
+            return 0;
     }
     
     /**
@@ -53,7 +56,10 @@ public class Statistics {
      * @return A int with the total.
      */
     public int getTotalEnergy(WildLife wildLife) {
-        return totalEnergyWildLife.get(wildLife);
+        if (totalEnergyWildLife.containsKey(wildLife))
+            return totalEnergyWildLife.get(wildLife);
+        else
+            return 0;
     }
     
     /**

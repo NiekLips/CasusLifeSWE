@@ -337,19 +337,33 @@ public class Animal extends Living {
     /**
      * If the activity has a target it will move towards the target, else it will wander in a searching direction.
      * Costs as much energy as the weight of the animal.
-     * TODO collision with obstacles, animals and water
      */
     public void move() {
+        double direction;
+        
         if (activity.getTarget() != null) {
             double deltaX = activity.getTarget().getX() - x;
             double deltaY = activity.getTarget().getY() - y;
-            double direction = Math.atan(deltaY / deltaX);
-            x += (getSpeed() * Math.cos(direction));
-            y += (getSpeed() * Math.sin(direction));
+            direction = Math.atan(deltaY / deltaX);
         }
         else {
-            //TODO move in a search direction
+            direction = Math.toRadians(new Random().nextInt(360));
         }
+        
+        double newX = x + (getSpeed() * Math.cos(direction));
+        double newY = y + (getSpeed() * Math.sin(direction));
+        if (newX < 0) newX += world.getWidth();
+        else if (newX > world.getWidth()) newX -= world.getWidth();
+        if (newY < 0) newY += world.getHeight();
+        else if (newY > world.getHeight()) newY -= world.getHeight();
+        
+        //direction = Math.toDegrees(direction);
+        //If a collisions happens at x & y, scan 180 degrees in the direction for a collision
+        //TODO collision with obstacles, animals and water
+
+        x = newX;
+        y = newY;
+        
         energy -= getWeight();
     }
     
