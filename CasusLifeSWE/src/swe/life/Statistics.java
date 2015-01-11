@@ -88,4 +88,23 @@ public class Statistics {
     public double getAverageEnergy(WildLife wildLife) {
         return totalEnergyWildLife.get(wildLife) / totalCountWildLife.get(wildLife);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null && obj instanceof Statistics) {
+            return false;
+        }
+        Statistics statistics = (Statistics)obj;
+        if (statistics.getTotalCount(WildLife.Omnivore) != this.getTotalCount(WildLife.Omnivore)) return false;
+        if (statistics.getTotalCount(WildLife.Carnivore) != this.getTotalCount(WildLife.Carnivore)) return false;
+        if (statistics.getTotalCount(WildLife.Herbivore) != this.getTotalCount(WildLife.Herbivore)) return false;
+        if (statistics.getTotalCount(WildLife.Vegetation) != this.getTotalCount(WildLife.Vegetation)) return false;
+        
+        if (statistics.getTotalEnergy(WildLife.Omnivore) != this.getTotalEnergy(WildLife.Omnivore)) return false;
+        if (statistics.getTotalEnergy(WildLife.Carnivore) != this.getTotalEnergy(WildLife.Carnivore)) return false;
+        if (statistics.getTotalEnergy(WildLife.Herbivore) != this.getTotalEnergy(WildLife.Herbivore)) return false;
+        if (statistics.getTotalEnergy(WildLife.Vegetation) != this.getTotalEnergy(WildLife.Vegetation)) return false;
+        
+        return true;
+    }
 }

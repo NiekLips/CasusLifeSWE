@@ -5,9 +5,13 @@
  */
 package swe.life;
 
+import java.sql.SQLException;
 import swe.life.objects.Object;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import swe.database.Database;
 import swe.life.objects.Animal;
 import swe.life.objects.Living;
 import swe.life.objects.Vegetation;
@@ -16,8 +20,8 @@ import swe.life.objects.Vegetation;
  * The world that contains a list of {@link Object objects}, the {@link Simulator simulator} and the {@link History history}.
  * @author Roy
  */
-public class World {
-    public final static int LINE_OF_SIGHT = 10;
+public final class World {
+    public final static int LINE_OF_SIGHT = 15;
     
     private int id;
     private int width;
@@ -46,8 +50,19 @@ public class World {
     public World(int width, int height, String todoo) {//TODO parameters for a new world
         this(width, height);
         
-        this.mObjects = new ArrayList<>();
-        //this.id = id; TODO new ID from DB
+        try {
+            this.id = Database.createSimulation();
+        } catch (SQLException ex) {
+            Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            if (!Database.saveStatistics(id, getCurrentStatistics())) System.out.println("Failed to save statistics");
+        } catch (SQLException ex) {
+            Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -59,6 +74,7 @@ public class World {
         this.width = width;
         this.height = height;
         
+        this.mObjects = new ArrayList<>();
         mSimulator = new Simulator(this);
     }
     
@@ -127,7 +143,7 @@ public class World {
                     double distance =  Math.sqrt(cx + cy);
                     if (distance <= closest || closest == -1) {
                         //TODO check for water
-                        if (distance < closest) closestObject = object;
+                        if (distance < closest || closest == -1) closestObject = object;
                     }
                 }
             }
@@ -138,9 +154,10 @@ public class World {
     /**
      * Returns the {@link Statistics statistics} where the world was generated with.
      * @return A statistics object from the database.
+     * @throws java.lang.Exception
      */
-    public Statistics getStatistics() {
-        return null; //TODO
+    public Statistics getStatistics() throws Exception {
+        return Database.getStatistics(this.id);
     }
     
     /**

@@ -65,6 +65,8 @@ public class Database {
      * @return If the creation of the tables went successful.
      */
     public static boolean createDatabase() {
+        if (connection == null) openConnection();
+        
         try (Statement stmt = connection.createStatement()) {
             List<String> existingTables = new ArrayList<>();
             DatabaseMetaData md = connection.getMetaData();
@@ -149,6 +151,8 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static int userExists(String name, String password) throws SQLException {
+        if (connection == null) openConnection();
+        
         String sql = "SELECT UserID FROM Users WHERE lower(UserName) = lower(?)";
         if (password != null) sql += " and Password = ?";
         sql += ";";
@@ -181,6 +185,8 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static boolean createUser(String name, String password, int rights) throws SQLException {
+        if (connection == null) openConnection();
+        
         String sql = "INSERT INTO Users (UserName, Password, UserRights) VALUES (?,?,?)";
         boolean succes = false;
         
@@ -206,6 +212,8 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static User userForID(int id) throws SQLException {
+        if (connection == null) openConnection();
+        
         String sql = "SELECT UserID, UserName, UserRights FROM Users WHERE UserID = ?";
         
         User u = null;
@@ -235,6 +243,8 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static boolean changePassword(int userID, String oldPassword, String newPassword) throws SQLException {
+        if (connection == null) openConnection();
+        
         String sql = "UPDATE Users SET Password = ? WHERE UserID = ? AND Password = ?";
         boolean succes = false;
         
@@ -281,6 +291,8 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static boolean saveStatistics(int simulationID, Statistics statistics) throws SQLException {
+        if (connection == null) openConnection();
+        
         WildLife wildLife;
         String sql = "INSERT INTO Statistics VALUES (?,?,?,?)";
         
@@ -328,6 +340,8 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static Statistics getStatistics(int simulationID) throws SQLException {
+        if (connection == null) openConnection();
+        
         String sql = "SELECT TotalCount, TotalEnergy, WildLife FROM Statistics WHERE SimulationID = ?";
         Statistics statistics = null;
         
@@ -358,6 +372,8 @@ public class Database {
      * @throws SQLException Will be thrown when a error with the database or SQL happens.
      */
     public static int createSimulation() throws SQLException {
+        if (connection == null) openConnection();
+        
         String sql = "INSERT INTO Simulations DEFAULT VALUES";
         
         int id = -1;
