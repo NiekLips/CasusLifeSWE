@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.*?>
 <?import javafx.scene.shape.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -7,8 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="545.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="swe.ui.WorldViewController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="545.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="swe.ui.WorldViewController">
    <children>
       <Pane fx:id="WorldPane" prefHeight="400.0" prefWidth="544.0">
          <children>
@@ -28,7 +28,7 @@
             <Label fx:id="LblOmniNR" layoutX="461.0" layoutY="111.0" />
             <Label layoutX="461.0" layoutY="126.0" text="Energy:" />
             <Label fx:id="LblOmniEnergy" layoutX="461.0" layoutY="141.0" />
-            <GridPane prefHeight="390.0" prefWidth="450.0" style="-fx-border: 2px solid; -fx-border-color: BLACK;">
+            <GridPane fx:id="WorldPane" prefHeight="390.0" prefWidth="450.0" style="-fx-border: 2px solid; -fx-border-color: BLACK;" visible="false">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" prefWidth="5.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" prefWidth="5.0" />
@@ -149,6 +149,7 @@
             <Label fx:id="LblHerbiEnergy" layoutX="462.0" layoutY="300.0" />
             <Label layoutX="455.0" layoutY="60.0" text="Speed:" />
             <Label fx:id="LblSpeed" layoutX="497.0" layoutY="60.0" text="10" />
+            <Canvas fx:id="cvWorld" height="390.0" width="450.0" />
          </children>
       </Pane>
    </children>

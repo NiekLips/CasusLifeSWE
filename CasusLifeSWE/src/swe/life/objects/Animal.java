@@ -364,9 +364,25 @@ public class Animal extends Living {
             y = newY;
         }
         else {
-            //direction = Math.toDegrees(direction);
-            //If a collisions happens at x & y, scan 180 degrees in the direction for a collision
-            //TODO collision with obstacles, animals and water
+            //If a collisions happens at x & y, scan for a new path
+            boolean collision = true;
+            while (collision) {
+                direction = Math.toDegrees(Math.toRadians(direction) + 45);
+
+                newX = x + (getSpeed() * Math.cos(direction));
+                newY = y + (getSpeed() * Math.sin(direction));
+                if (newX < 0) newX += world.getWidth();
+                else if (newX > world.getWidth()) newX -= world.getWidth();
+                if (newY < 0) newY += world.getHeight();
+                else if (newY > world.getHeight()) newY -= world.getHeight();
+                
+                destinationObjects = world.getObjectsForXY((int)newX, (int)newY);
+                if (destinationObjects.isEmpty()) {
+                    //TODO collision with obstacles, animals and water
+                    x = newX;
+                    y = newY;
+                }
+            }
         }
 
         

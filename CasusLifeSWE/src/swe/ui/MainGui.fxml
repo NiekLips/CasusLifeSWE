@@ -22,6 +22,7 @@
             <Button fx:id="BtnAddUser" layoutX="5.0" layoutY="225.0" mnemonicParsing="false" onAction="#handleButtonAddUserAction" prefHeight="25.0" prefWidth="100.0" text="Add User" />
             <Button fx:id="BtnChangePassword" layoutX="5.0" layoutY="195.0" mnemonicParsing="false" onAction="#handleButtonChangePasswordAction" prefHeight="25.0" prefWidth="100.0" text="Change password" />
             <Button fx:id="BtnExit" layoutX="5.0" layoutY="396.0" mnemonicParsing="false" onAction="#handleButtonExitAction" prefHeight="25.0" prefWidth="100.0" text="Exit" />
+            <Button fx:id="BtnBack" layoutX="5.0" layoutY="366.0" mnemonicParsing="false" onAction="#handleButtonBackAction" prefHeight="25.0" prefWidth="100.0" text="Back" visible="false" />
          </children>
       </Pane>
       <Pane fx:id="OutputPane" layoutX="111.0" prefHeight="25.0" prefWidth="544.0">

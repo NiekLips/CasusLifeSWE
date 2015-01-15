@@ -33,9 +33,6 @@ public class WorldTest {
     public static void setUpClass() {
         System.out.println("setUpClass");
         
-        List<YourClass> list = new ArrayList<>();
-        YourClass yc = new YourClass(list);
-        
         world = new World(25, 25, "");
         
         objects = new ArrayList<>();

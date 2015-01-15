@@ -7,7 +7,9 @@ package swe.life;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import javafx.application.Platform;
 import swe.life.objects.Living;
+import swe.ui.WorldViewController;
 
 /**
  * Handles the simulation in the {@link World}.
@@ -118,6 +120,13 @@ public class Simulator {
                         ((Living)object).simulate();
                     }
                 }
+                
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (WorldViewController.instance != null) WorldViewController.instance.draw();
+                    }
+                });
             }
         }, 0, period);
         return true;

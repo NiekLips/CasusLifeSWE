@@ -21,6 +21,8 @@ import swe.life.objects.Vegetation;
  * @author Roy
  */
 public final class World {
+    public static World instance;
+    
     public final static int LINE_OF_SIGHT = 15;
     
     private int id;
@@ -76,6 +78,8 @@ public final class World {
         
         this.mObjects = new ArrayList<>();
         mSimulator = new Simulator(this);
+        
+        instance = this;
     }
     
     /**

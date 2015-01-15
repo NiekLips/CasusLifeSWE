@@ -63,9 +63,4 @@ public class AddUserController implements Initializable {
         }
     }
     
-    
-    @FXML private void handleButtonBackAction(ActionEvent event)
-    {
-        
-    }
 }
