@@ -5,6 +5,7 @@
  */
 package swe.life.objects;
 
+import java.util.List;
 import java.util.Random;
 import javafx.scene.paint.Color;
 import swe.life.World;
@@ -357,12 +358,17 @@ public class Animal extends Living {
         if (newY < 0) newY += world.getHeight();
         else if (newY > world.getHeight()) newY -= world.getHeight();
         
-        //direction = Math.toDegrees(direction);
-        //If a collisions happens at x & y, scan 180 degrees in the direction for a collision
-        //TODO collision with obstacles, animals and water
+        List<Object> destinationObjects = world.getObjectsForXY((int)newX, (int)newY);
+        if (destinationObjects.isEmpty()) {
+            x = newX;
+            y = newY;
+        }
+        else {
+            //direction = Math.toDegrees(direction);
+            //If a collisions happens at x & y, scan 180 degrees in the direction for a collision
+            //TODO collision with obstacles, animals and water
+        }
 
-        x = newX;
-        y = newY;
         
         energy -= getWeight();
     }
