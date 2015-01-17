@@ -13,6 +13,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
+import swe.life.Statistics;
+import swe.life.WildLife;
 import swe.life.World;
 import swe.life.objects.Object;
 
@@ -27,6 +30,8 @@ public class WorldViewController implements Initializable {
     private boolean pauze = false;
 
     @FXML private Canvas cvWorld;
+    @FXML Label LblOmniNR, LblVegiNR, LblCarniNR, LblHerbiNR;
+    @FXML Label LblOmniEnergy, LblVegiEnergy, LblCarniEnergy, LblHerbiEnergy;
     
     /**
      * Initializes the controller class.
@@ -41,7 +46,8 @@ public class WorldViewController implements Initializable {
     /**
      * Draws the current world in the canvas.
      */
-    public void draw() { 
+    public void draw() 
+    { 
         World world = World.instance;
         
         GraphicsContext g = cvWorld.getGraphicsContext2D();
@@ -52,14 +58,34 @@ public class WorldViewController implements Initializable {
         List<Object> objects;
         Object lastObject;
         
-        for (int i = 0; i < world.getWidth(); i++) {
-            for (int j = 0; j < world.getHeight(); j++) {
+        for (int i = 0; i < world.getWidth(); i++) 
+        {
+            for (int j = 0; j < world.getHeight(); j++) 
+            {
                 objects = world.getObjectsForXY(i, j);
                 lastObject = objects.get(objects.size()-1);
                 g.setFill(lastObject.getColor());
                 g.fillRect(i, j, canvasDrawWidth, canvasDrawHeight);
-                
             }
+        }
+        
+        try
+        {
+        Statistics Stats = World.instance.getCurrentStatistics();
+        //update labels 
+        LblOmniNR.setText(String.valueOf(Stats.getTotalCount(WildLife.Omnivore)));
+        LblVegiNR.setText(String.valueOf(Stats.getTotalCount(WildLife.Vegetation)));
+        LblCarniNR.setText(String.valueOf(Stats.getTotalCount(WildLife.Carnivore)));
+        LblHerbiNR.setText(String.valueOf(Stats.getTotalCount(WildLife.Herbivore)));
+        
+        LblOmniEnergy.setText(String.valueOf(Stats.getTotalEnergy(WildLife.Omnivore)));
+        LblVegiEnergy.setText(String.valueOf(Stats.getTotalEnergy(WildLife.Vegetation)));
+        LblCarniEnergy.setText(String.valueOf(Stats.getTotalEnergy(WildLife.Carnivore)));
+        LblHerbiEnergy.setText(String.valueOf(Stats.getTotalEnergy(WildLife.Herbivore)));
+        }
+        catch(Exception e)
+        {
+            MainGuiController.instance.LblOutput.setText(e.getMessage());
         }
     }
     

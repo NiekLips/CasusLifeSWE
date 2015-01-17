@@ -58,6 +58,7 @@ public class MainGuiController implements Initializable {
      */
     @FXML private void handleButtonLoadWorldAction(ActionEvent event) 
     {
+        
     }
                 
     /**
