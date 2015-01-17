@@ -30,15 +30,17 @@ public class MainGuiController implements Initializable {
     
     @FXML Pane ViewPane;
     @FXML Button BtnBack;
-    
+    @FXML Label LblOutput;
+    public static MainGuiController instance;
     
     /**
      * actie bij klikken op New World
      * @param event 
      */
-    @FXML private void handleButtonNewWorldAction(ActionEvent event) 
+    @FXML private void handleButtonNewWorldAction(ActionEvent event) throws IOException 
     {
-        
+        ViewPane.getChildren().clear();
+        ViewPane.getChildren().add(FXMLLoader.load(getClass().getResource("WorldView.fxml")));
     }
     
     /**
@@ -47,6 +49,7 @@ public class MainGuiController implements Initializable {
      */
     @FXML private void handleButtonSaveWorldAction(ActionEvent event) 
     {
+        
     }
     
     /**
@@ -118,6 +121,7 @@ public class MainGuiController implements Initializable {
     }
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        instance = this;
         World world = new World(25, 25, "");
         
         List<Object> objects = new ArrayList<>();

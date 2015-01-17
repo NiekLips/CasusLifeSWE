@@ -8,6 +8,7 @@ package swe.ui;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -23,6 +24,7 @@ import swe.life.objects.Object;
 public class WorldViewController implements Initializable {
    
     public static WorldViewController instance;
+    private boolean pauze = false;
 
     @FXML private Canvas cvWorld;
     
@@ -66,5 +68,74 @@ public class WorldViewController implements Initializable {
      */
     public void clear() {
         cvWorld.getGraphicsContext2D().clearRect(0, 0, cvWorld.getWidth(), cvWorld.getHeight());
+    }
+    
+    /**
+     * actie bij klikken op Play
+     * @param event 
+     */
+    @FXML private void handleButtonPlayAction(ActionEvent event) 
+    {
+        if (!pauze)
+        {
+            World.instance.getSimulator().startSimulation(1);
+        }
+        else
+        {
+            World.instance.getSimulator().continueSimulation();
+            pauze= false;
+        }
+    }
+    
+    /**
+     * actie bij klikken op Stop
+     * @param event 
+     */
+    @FXML private void handleButtonStopAction(ActionEvent event) 
+    {
+        World.instance.getSimulator().stopSimulation();
+    }
+    
+    /**
+     * actie bij klikken op Pauze
+     * @param event 
+     */
+    @FXML private void handleButtonPauzeAction(ActionEvent event) 
+    {
+        World.instance.getSimulator().pauseSimulation();
+        pauze = true;
+    }
+    
+    /**
+     * actie bij klikken op Slow
+     * @param event 
+     */
+    @FXML private void handleButtonSlowAction(ActionEvent event) 
+    {
+        try
+        {
+            World.instance.getSimulator().setSpeed(World.instance.getSimulator().getSpeed()-1);
+        }
+        catch(Exception e)
+        {
+            MainGuiController.instance.LblOutput.setText(e.getMessage());
+        }
+        
+    }
+    
+    /**
+     * actie bij klikken op Fast
+     * @param event 
+     */
+    @FXML private void handleButtonFastAction(ActionEvent event) 
+    {
+        try
+        {
+            World.instance.getSimulator().setSpeed(World.instance.getSimulator().getSpeed()+ 1);
+        }
+        catch(Exception e)
+        {
+            MainGuiController.instance.LblOutput.setText(e.getMessage());
+        }
     }
 }

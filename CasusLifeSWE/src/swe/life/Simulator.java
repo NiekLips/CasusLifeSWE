@@ -136,7 +136,7 @@ public class Simulator {
      * Returns the current speed of the simulation.
      * @return The speed as a double.
      */
-    private double getSpeed() {
+    public double getSpeed() {
         return period / 1000;
     }
 }

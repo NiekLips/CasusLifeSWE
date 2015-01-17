@@ -20,9 +20,9 @@
             <Label fx:id="LblVegiNR" layoutX="462.0" layoutY="350.0" />
             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#df00ff" height="80.0" layoutX="455.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="90.0" />
             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="YELLOW" height="80.0" layoutX="455.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="90.0" />
-            <Button fx:id="BtnPlay" graphicTextGap="0.0" layoutX="485.0" layoutY="5.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="26.0" text="&gt;" wrapText="true" />
-            <Button fx:id="BtnStop" graphicTextGap="0.0" layoutX="455.0" layoutY="5.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="26.0" text="▪" wrapText="true" />
-            <Button fx:id="BtnPauze" graphicTextGap="0.0" layoutX="515.0" layoutY="5.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="26.0" text="| |" wrapText="true" />
+            <Button fx:id="BtnPlay" graphicTextGap="0.0" layoutX="485.0" layoutY="5.0" mnemonicParsing="false" onAction="#handleButtonPlayAction" prefHeight="15.0" prefWidth="26.0" text="&gt;" wrapText="true" />
+            <Button fx:id="BtnStop" graphicTextGap="0.0" layoutX="455.0" layoutY="5.0" mnemonicParsing="false" onAction="#handleButtonStopAction" prefHeight="15.0" prefWidth="26.0" text="▪" wrapText="true" />
+            <Button fx:id="BtnPauze" graphicTextGap="0.0" layoutX="515.0" layoutY="5.0" mnemonicParsing="false" onAction="#handleButtonPauzeAction" prefHeight="15.0" prefWidth="26.0" text="| |" wrapText="true" />
             <Label layoutX="461.0" layoutY="81.0" text="Omnivores" />
             <Label layoutX="461.0" layoutY="96.0" text="Number of:" />
             <Label fx:id="LblOmniNR" layoutX="461.0" layoutY="111.0" />
@@ -134,8 +134,8 @@
                   <RowConstraints minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
                </rowConstraints>
             </GridPane>
-            <Button fx:id="BtnSlow" alignment="TOP_CENTER" graphicTextGap="0.0" layoutX="455.0" layoutY="33.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="40.0" text="&lt;&lt;" textAlignment="JUSTIFY" wrapText="true" />
-            <Button fx:id="BtnFast" alignment="TOP_CENTER" graphicTextGap="0.0" layoutX="501.0" layoutY="33.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="40.0" text="&gt;&gt;" textAlignment="JUSTIFY" wrapText="true" />
+            <Button fx:id="BtnSlow" alignment="TOP_CENTER" graphicTextGap="0.0" layoutX="455.0" layoutY="33.0" mnemonicParsing="false" onAction="#handleButtonSlowAction" prefHeight="25.0" prefWidth="40.0" text="&lt;&lt;" textAlignment="JUSTIFY" wrapText="true" />
+            <Button fx:id="BtnFast" alignment="TOP_CENTER" graphicTextGap="0.0" layoutX="501.0" layoutY="33.0" mnemonicParsing="false" onAction="#handleButtonFastAction" prefHeight="25.0" prefWidth="40.0" text="&gt;&gt;" textAlignment="JUSTIFY" wrapText="true" />
             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="RED" height="80.0" layoutX="455.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="90.0" />
             <Label fx:id="LblCarniEnergy" layoutX="461.0" layoutY="220.0" />
             <Label layoutX="461.0" layoutY="205.0" text="Energy:" />
