@@ -32,6 +32,7 @@ public class WorldViewController implements Initializable {
     @FXML private Canvas cvWorld;
     @FXML Label LblOmniNR, LblVegiNR, LblCarniNR, LblHerbiNR;
     @FXML Label LblOmniEnergy, LblVegiEnergy, LblCarniEnergy, LblHerbiEnergy;
+    @FXML Label LblSpeed;
     
     /**
      * Initializes the controller class.
@@ -87,6 +88,8 @@ public class WorldViewController implements Initializable {
         {
             MainGuiController.instance.LblOutput.setText(e.getMessage());
         }
+        
+        LblSpeed.setText(String.valueOf(World.instance.getSimulator().getSpeed()));
     }
     
     /**
