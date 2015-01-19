@@ -123,21 +123,6 @@ public class MainGuiController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         instance = this;
-        World world = new World(25, 25, "");
-        
-        List<Object> objects = new ArrayList<>();
-        objects.add(new Animal(0, 0, world, Digestion.Carnivorous, Sex.Male, 100, 4, 70, 10, 20, 25, 10, 20));
-        objects.add(new Animal(5, 5, world, Digestion.Herbivorous, Sex.Male, 100, 4, 70, 10, 20, 25, 10, 20));
-        objects.add(new Animal(0, 9, world, Digestion.Herbivorous, Sex.Female, 100, 4, 70, 10, 20, 25, 10, 20));
-        
-        
-        for (int i = 0; i < world.getWidth(); i++) {
-            for (int j = 0; j < world.getHeight(); j++) {
-                //objects.add(new Land(0, 9, world, Digestion.Herbivorous, Sex.Female, 100, 4, 70, 10, 20, 25, 10, 20));
-            }
-        }
-        
-        world.getSimulator().startSimulation(1);
     }    
     
 }

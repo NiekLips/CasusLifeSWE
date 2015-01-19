@@ -241,10 +241,10 @@ public class Animal extends Living {
      * @return Legs * 10 + (energy-strength)
      */
     public double getWeight() {
-        if ((energy - strength) > 0)
-            return (legs * 10 + (energy - strength));
-        else
-            return (legs * 10);
+       // if ((energy - strength) > 0)
+       //     return (legs * 10 + (energy - strength));
+       // else
+            return (legs * 2);
     }
     
     /** Returns the calculated speed of the animal.
@@ -334,7 +334,7 @@ public class Animal extends Living {
             int lStamina = getPropagateValue(animal.getStamina(), getStamina(), random);
             int lStrength = getPropagateValue(animal.getStrength(), getStrength(), random);
             int lSwimThreshold = getPropagateValue(animal.getStrength(), getStrength(), random);
-            Animal child = new Animal(x, y, world, lDigestion, lSex, lEnergy, lLegs, lMateThreshold, lMoveThreshold, lReproductionCosts, lStamina, lStrength, lSwimThreshold);
+            //Animal child = new Animal(x, y, world, lDigestion, lSex, lEnergy, lLegs, lMateThreshold, lMoveThreshold, lReproductionCosts, lStamina, lStrength, lSwimThreshold);
         }
     }
     
@@ -376,7 +376,7 @@ public class Animal extends Living {
         
         List<Object> destinationObjects = world.getObjectsForXY((int)newX, (int)newY);
 
-        if (destinationObjects.size() == 1 && destinationObjects.get(0) instanceof Land || (destinationObjects.get(0) instanceof Water && overWater)) { //Since there will only be land
+        if (destinationObjects.size() == 1 && (destinationObjects.get(0) instanceof Land || (destinationObjects.get(0) instanceof Water && overWater))) { //Since there will only be land
             x = newX;
             y = newY;
         }
@@ -398,7 +398,7 @@ public class Animal extends Living {
                 else if (newY > world.getHeight()) newY -= world.getHeight();
                 
                 destinationObjects = world.getObjectsForXY((int)newX, (int)newY);
-                if (destinationObjects.size() == 1 && destinationObjects.get(0) instanceof Land || (destinationObjects.get(0) instanceof Water && overWater)) {
+                if (destinationObjects.size() == 1 && (destinationObjects.get(0) instanceof Land || (destinationObjects.get(0) instanceof Water && overWater))) {
                     //TODO collision with obstacles, animals and water
                     x = newX;
                     y = newY;

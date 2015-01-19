@@ -48,7 +48,7 @@ public class PresetController implements Initializable {
             for(int j =0;j < height;j++)
             {
                 int choise = Temp.nextInt(36);
-                int legs = Temp.nextInt(6);
+                int legs = 1+Temp.nextInt(6);
                 int stamina = (legs*150);
                 if(i > borderW && i < (width - borderW) && j > borderH && j < (height - borderH)
                     //&& (((i > width/2) && (j > height/2)&& j-i <= width /2)
