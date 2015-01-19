@@ -59,11 +59,11 @@ public class PresetController implements Initializable {
                 {
                     if(choise < 18)
                     {
-                        world.addObject( new Land(i,j));
+                        world.addObject( new Land(i,j, world));
                     }
                     else if(choise < 22)
                     {
-                        world.addObject(new Land(i,j));                        
+                        world.addObject(new Land(i,j, world));                        
                         if(choise%2==0)
                         {
                             world.addObject(new Animal(i,j, world,Herbivorous, 
@@ -77,7 +77,7 @@ public class PresetController implements Initializable {
                     }
                     else if(choise < 26)
                     {
-                        world.addObject(new Land(i,j));                        
+                        world.addObject(new Land(i,j, world));                        
                         if(choise%2==0)
                         {
                             world.addObject(new Animal(i,j, world,Carnivorous, 
@@ -91,7 +91,7 @@ public class PresetController implements Initializable {
                     }
                     else if(choise < 30)
                     {
-                        world.addObject(new Land(i,j));                        
+                        world.addObject(new Land(i,j, world));                        
                         if(choise ==26)
                         {
                             world.addObject(new Animal(i,j, world,OmnivorousPreferMeat, 
@@ -115,18 +115,18 @@ public class PresetController implements Initializable {
                     }
                     else if(choise < 34)
                     {
-                        world.addObject(new Land(i,j));
+                        world.addObject(new Land(i,j, world));
                         world.addObject(new Vegetation(i,j, world, choise, 0));
                     }
                     else
                     {
-                        world.addObject(new Land(i,j));
+                        world.addObject(new Land(i,j, world));
                         world.addObject(new Obstacle(i,j));
                     }
                 }
                 else
                 {
-                    world.addObject(new Water(i,j));                    
+                    world.addObject(new Water(i,j, world));                    
                 }
                 
             }

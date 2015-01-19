@@ -224,7 +224,8 @@ public final class World {
      * @return The result of the remove.
      */
     public boolean removeObject(Object object) {
-        return mObjects.remove(object);
+        //return mObjects.remove(object); //TODO fix deze
+        return true;
     }
     
     /**
@@ -234,4 +235,30 @@ public final class World {
     public Simulator getSimulator() {
         return mSimulator;
     }
+    
+//        BtnBack.setVisible(false);
+//        ViewPane.getChildren().clear();
+//        try {
+//            ViewPane.getChildren().add(FXMLLoader.load(getClass().getResource("WorldView.fxml")));
+//        } catch (IOException ex) {
+//            Logger.getLogger(MainGuiController.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        
+//        World world = new World(25, 25, "");
+//        
+//        List<Object> objects = new ArrayList<>();
+//        
+//        for (int i = 0; i < world.getWidth(); i++) {
+//            for (int j = 0; j < world.getHeight(); j++) {
+//                objects.add(new Land(i, j, world));
+//            }
+//        }
+//        
+//        objects.add(new Animal(0, 0, world, Digestion.Carnivorous, Sex.Male, 1000, 4, 70, 10, 20, 1000, 750, 30));
+//        objects.add(new Animal(5, 5, world, Digestion.Herbivorous, Sex.Male, 750, 4, 70, 10, 20, 600, 650, 20));
+//        objects.add(new Animal(0, 9, world, Digestion.Herbivorous, Sex.Female, 500, 4, 70, 10, 20, 400, 300, 20));
+//        objects.add(new Vegetation(6, 5, world, 200, 0));
+//        objects.add(new Vegetation(5, 10, world, 400, 0));
+//        
+//        world.getSimulator().startSimulation(1);
 }

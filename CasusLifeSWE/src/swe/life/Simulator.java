@@ -5,6 +5,7 @@
  */
 package swe.life;
 
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
@@ -103,30 +104,39 @@ public class Simulator {
         return isSimulationRunning;
     }
     
+    private Object object;
+    
     /**
      * Starts the timer with the simulation methods.
      * @param period The time in milliseconds between the task calls.
      * @return If the timer can be started, like when its not running already.
      */
     private boolean startTimer(int period) {
+        object = new Object();
+        
         this.period = period;
         if (isSimulationRunning) return false;
         if (timer == null) timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (Object object : world.getObjects()) { //TODO manage a seperate list with Living objects
-                    if (object instanceof Living) {
-                        ((Living)object).simulate();
+                synchronized (object) {
+                    Iterator<swe.life.objects.Object> it = world.getObjects().iterator();
+                   // Object object;
+                    while (it.hasNext()) { //TODO manage a seperate list with Living objects
+                        Object object = it.next();
+                        if (object instanceof Living) {
+                            ((Living)object).simulate();
+                        }
                     }
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (WorldViewController.instance != null) WorldViewController.instance.draw();
+                        }
+                    });
                 }
-                
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (WorldViewController.instance != null) WorldViewController.instance.draw();
-                    }
-                });
             }
         }, 0, period);
         return true;

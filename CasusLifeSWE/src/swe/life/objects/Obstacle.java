@@ -15,7 +15,7 @@ import swe.life.World;
  */
 public class Obstacle extends Landscape {
     public Obstacle(int x, int y) {
-        this(x, y, Color.BLACK, World.instance);
+        this(x, y, Color.BLACK, null);
     }
     
     private Obstacle(int x, int y, Color color, World world) {

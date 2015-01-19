@@ -13,6 +13,8 @@ import swe.life.objects.enumerations.Digestion;
 import swe.life.objects.enumerations.Direction;
 import swe.life.objects.enumerations.Goal;
 import swe.life.objects.enumerations.Sex;
+import swe.life.objects.Land;
+import swe.life.objects.Water;
 
 /**
  * This class is moving living {@link Object} in the world that extends the Dynamic class.
@@ -30,7 +32,7 @@ public class Animal extends Living {
     private int energy;
     private int legs;
     private int mateThreshold; //% of stamina a animal wants to mate
-    private int moveThreshold;
+    private int moveThreshold; //% of stamina a animal can to move
     private int reproductionCosts; //% of stamina that gets transmitted to the child
     private int stamina; //Maximum amount of energy
     private int strength;
@@ -44,12 +46,23 @@ public class Animal extends Living {
         this.sex = sex;
         this.energy = energy;
         this.legs = legs;
-        this.mateThreshold = mateThreshold;
-        this.moveThreshold = moveThreshold;
+        this.mateThreshold = checkPercent(mateThreshold);
+        this.moveThreshold = checkPercent(moveThreshold);
         this.reproductionCosts = reproductionCosts;
         this.stamina = stamina;
         this.strength = strength;
-        this.swimThreshold = swimThreshold;
+        this.swimThreshold = checkPercent(swimThreshold);
+    }
+    
+    /**
+     * Makes sure the percentage given is correct.
+     * @param percent The percentage to check.
+     * @return A correct percentage, corrected if it was incorrect.
+     */
+    private int checkPercent(int percent) {
+        if (percent < 0) return 0;
+        if (percent > 100) return 100;
+        return percent;
     }
     
     /**
@@ -79,7 +92,7 @@ public class Animal extends Living {
     @Override
     public int eaten() {
         world.removeObject(this);
-        return energy; //TODO correct this (should be hunter.strength - self.stamina)
+        return stamina / 2; //TODO correct this (should be hunter.strength - self.stamina)
     }
 
     /**
@@ -87,25 +100,27 @@ public class Animal extends Living {
      */
     @Override
     public void simulate() {
+        float percentEnergy = ((energy*100) / stamina);
+        
         //Find or goto a mate
-        if (energy > mateThreshold) {
+        if (percentEnergy > mateThreshold) {
             if (activity.getGoal() != Goal.FindPartner) {
                 activity.setGoal(Goal.FindPartner);
             }
             
             if (activity.getTarget() == null) {
                 activity.setTarget(world.getNearestObjectKindFrom(Animal.class, x, y, false));
-                move();
+                move(false);
             }
             else { //A potential mate has been found
                 if (isWithinReach(activity.getTarget()))
                     propagate((Animal)activity.getTarget());
                 else
-                    move();
+                    move(false);
             }
         }
         //Find or goto a food on land
-        else if (energy > swimThreshold) {
+        else if (percentEnergy > swimThreshold) {
             if (activity.getGoal() != Goal.FindFood) {
                 activity.setGoal(Goal.FindFood);
             }
@@ -141,17 +156,17 @@ public class Animal extends Living {
                     */
                 }
                 
-                move();
+                move(false);
             }
             else { //A potential meal has been found
                 if (isWithinReach(activity.getTarget()))
                     eat((Living)activity.getTarget());
                 else
-                    move();
+                    move(false);
             }
         }
         //Find or goto a food on land and water
-        else if (energy > moveThreshold) {
+        else if (percentEnergy > moveThreshold) {
             if (activity.getGoal() != Goal.FindFood) {
                 activity.setGoal(Goal.FindFood);
             }
@@ -187,13 +202,13 @@ public class Animal extends Living {
                     */
                 }
             
-                move();
+                move(true);
             }
             else { //A potential meal has been found
                 if (isWithinReach(activity.getTarget()))
                     eat((Living)activity.getTarget());
                 else
-                    move();
+                    move(true);
             }
         }
         //Wait for food to spawn
@@ -202,7 +217,7 @@ public class Animal extends Living {
                 activity.setGoal(Goal.FindFood);
             } //TODO re-search at some point
             
-            if (isWithinReach(activity.getTarget()))
+            if (activity.getTarget() != null && isWithinReach(activity.getTarget()))
                 eat((Living)activity.getTarget());
         }
         //Die
@@ -226,10 +241,10 @@ public class Animal extends Living {
      * @return Legs * 10 + (energy-strength)
      */
     public double getWeight() {
-       // if (energy - strength > 0)
-       //     return (legs * 10 + (energy-strength));
-       // else
-            return (legs * 2);
+        if ((energy - strength) > 0)
+            return (legs * 10 + (energy - strength));
+        else
+            return (legs * 10);
     }
     
     /** Returns the calculated speed of the animal.
@@ -338,8 +353,9 @@ public class Animal extends Living {
     /**
      * If the activity has a target it will move towards the target, else it will wander in a searching direction.
      * Costs as much energy as the weight of the animal.
+     * @param overWater If the animal can swim through water.
      */
-    public void move() {
+    public void move(boolean overWater) {
         double direction;
         
         if (activity.getTarget() != null) {
@@ -359,14 +375,19 @@ public class Animal extends Living {
         else if (newY > world.getHeight()) newY -= world.getHeight();
         
         List<Object> destinationObjects = world.getObjectsForXY((int)newX, (int)newY);
-        if (destinationObjects.isEmpty()) {
+
+        if (destinationObjects.size() == 1 && destinationObjects.get(0) instanceof Land || (destinationObjects.get(0) instanceof Water && overWater)) { //Since there will only be land
             x = newX;
             y = newY;
         }
         else {
             //If a collisions happens at x & y, scan for a new path
+            int maxChecks = 8;
+            int checkCount = 0;
             boolean collision = true;
             while (collision) {
+                checkCount++;
+                if (checkCount == maxChecks) break;
                 direction = Math.toDegrees(Math.toRadians(direction) + 45);
 
                 newX = x + (getSpeed() * Math.cos(direction));
@@ -377,14 +398,14 @@ public class Animal extends Living {
                 else if (newY > world.getHeight()) newY -= world.getHeight();
                 
                 destinationObjects = world.getObjectsForXY((int)newX, (int)newY);
-                if (destinationObjects.isEmpty()) {
+                if (destinationObjects.size() == 1 && destinationObjects.get(0) instanceof Land || (destinationObjects.get(0) instanceof Water && overWater)) {
                     //TODO collision with obstacles, animals and water
                     x = newX;
                     y = newY;
+                    collision = false;
                 }
             }
         }
-
         
         energy -= getWeight();
     }
