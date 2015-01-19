@@ -35,9 +35,9 @@ public class PresetController implements Initializable {
         MainGuiController.instance.ViewPane.getChildren().clear();
         MainGuiController.instance.ViewPane.getChildren().add(FXMLLoader.load(getClass().getResource("WorldView.fxml")));
     
-        new World(75,75);
-        int width = World.instance.getWidth();
-        int height = World.instance.getHeight();
+        World world = new World(50,50,"");
+        int width = world.getWidth();
+        int height = world.getHeight();
         int borderW = (width/10)-1;
         int borderH = (height/10) -1;
 
@@ -50,84 +50,87 @@ public class PresetController implements Initializable {
         {
             for(int j =0;j < height;j++)
             {
-                if(i > borderW || i < (width - borderW) || j > borderH || j < (height - borderH)
-                    || i+j < 75 || i+j >25 || (j > 25 && i < 25 && j-i >25) || (j < 25 && i >25 && i-j >25))
+                if(i > borderW && i < (width - borderW) && j > borderH && j < (height - borderH)
+                    && (((i > width / 2) && (j > height / 2)&& j-i < width /2)
+                    || i+j > width / 2 
+                    || ((j > height / 2) && (i > width / 2) && j-i > width / 2) 
+                    || ((j < height / 2) && (i > width / 2) && i-j >width / 2)))
                 {
                     if(choise < 18)
                     {
-                        World.instance.addObject( new Land(i,j));
+                        world.addObject( new Land(i,j));
                     }
                     else if(choise < 22)
                     {
-                        World.instance.addObject(new Land(i,j));                        
+                        world.addObject(new Land(i,j));                        
                         if(choise%2==0)
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,Herbivorous, 
+                            world.addObject(new Animal(i,j, world,Herbivorous, 
                                 Male,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));   
                         }
                         else
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,Herbivorous, 
+                            world.addObject(new Animal(i,j, world,Herbivorous, 
                                 Female,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));                            
                         }
                     }
                     else if(choise < 26)
                     {
-                        World.instance.addObject(new Land(i,j));                        
+                        world.addObject(new Land(i,j));                        
                         if(choise%2==0)
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,Carnivorous, 
+                            world.addObject(new Animal(i,j, world,Carnivorous, 
                                 Male,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));   
                         }
                         else
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,Carnivorous, 
+                            world.addObject(new Animal(i,j, world,Carnivorous, 
                                 Female,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));                            
                         }
                     }
                     else if(choise < 30)
                     {
-                        World.instance.addObject(new Land(i,j));                        
+                        world.addObject(new Land(i,j));                        
                         if(choise ==26)
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,OmnivorousPreferMeat, 
+                            world.addObject(new Animal(i,j, world,OmnivorousPreferMeat, 
                                 Male,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));   
                         }
                         else if(choise == 27)
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,OmnivorousPreferMeat, 
+                            world.addObject(new Animal(i,j, world,OmnivorousPreferMeat, 
                                 Female,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));                            
                         }
                         if(choise ==28)
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,OmnivorousPreferVegetation, 
+                            world.addObject(new Animal(i,j, world,OmnivorousPreferVegetation, 
                                 Male,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));   
                         }
                         else if(choise == 29)
                         {
-                            World.instance.addObject(new Animal(i,j, World.instance,OmnivorousPreferVegetation, 
+                            world.addObject(new Animal(i,j, world,OmnivorousPreferVegetation, 
                                 Female,stamina, legs, stamina-30, legs*4, legs*3, stamina, legs*2, legs*40));                            
                         }
                     }
                     else if(choise < 34)
                     {
-                        World.instance.addObject(new Land(i,j));
-                        World.instance.addObject(new Vegetation(i,j, World.instance, choise, 0));
+                        world.addObject(new Land(i,j));
+                        world.addObject(new Vegetation(i,j, world, choise, 0));
                     }
                     else
                     {
-                        World.instance.addObject(new Land(i,j));
-                        World.instance.addObject(new Obstacle(i,j));
+                        world.addObject(new Land(i,j));
+                        world.addObject(new Obstacle(i,j));
                     }
                 }
                 else
                 {
-                    World.instance.addObject(new Water(i,j));                    
+                    world.addObject(new Water(i,j));                    
                 }
             }
         }
         
-        
+        WorldViewController.instance.draw();
     }
     /**
      * Initializes the controller class.

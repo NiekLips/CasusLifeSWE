@@ -15,7 +15,7 @@ import swe.life.World;
  */
 public class Land extends Landscape {
     public Land(int x, int y) {
-        this(x, y, Color.WHITE, null);
+        this(x, y, Color.WHITE, World.instance);
     }
     
     private Land(int x, int y, Color color, World world) {
