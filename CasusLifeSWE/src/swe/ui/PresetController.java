@@ -42,19 +42,20 @@ public class PresetController implements Initializable {
         int borderH = (height/10) -1;
 
         Random Temp = new Random();
-        int choise = Temp.nextInt(36);
-        int legs = Temp.nextInt(6);
-        int stamina = (legs*150);
 
         for(int i =0;i < width;i++)
         {
             for(int j =0;j < height;j++)
             {
+                int choise = Temp.nextInt(36);
+                int legs = Temp.nextInt(6);
+                int stamina = (legs*150);
                 if(i > borderW && i < (width - borderW) && j > borderH && j < (height - borderH)
-                    && (((i > width / 2) && (j > height / 2)&& j-i < width /2)
-                    || i+j > width / 2 
-                    || ((j > height / 2) && (i > width / 2) && j-i > width / 2) 
-                    || ((j < height / 2) && (i > width / 2) && i-j >width / 2)))
+                    //&& (((i > width/2) && (j > height/2)&& j-i <= width /2)
+                   // || ((i < width/2) && (j < height/2)&& i+j >= width / 2)
+                   // || ((j > height / 2) && (i > width / 2) && ((i-25)+(j-25)) <= width / 2) 
+                   // || ((j < height / 2) && (i > width / 2) && i-j <= width / 2))
+                    )
                 {
                     if(choise < 18)
                     {
@@ -127,6 +128,7 @@ public class PresetController implements Initializable {
                 {
                     world.addObject(new Water(i,j));                    
                 }
+                
             }
         }
         

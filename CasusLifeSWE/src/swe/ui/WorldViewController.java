@@ -66,7 +66,7 @@ public class WorldViewController implements Initializable {
                 objects = world.getObjectsForXY(i, j);
                 lastObject = objects.get(objects.size()-1);
                 g.setFill(lastObject.getColor());
-                g.fillRect(i, j, canvasDrawWidth, canvasDrawHeight);
+                g.fillRect(i*canvasDrawWidth, j*canvasDrawHeight, canvasDrawWidth, canvasDrawHeight);
             }
         }
         
@@ -107,7 +107,7 @@ public class WorldViewController implements Initializable {
     {
         if (!pauze)
         {
-            World.instance.getSimulator().startSimulation(1);
+            World.instance.getSimulator().startSimulation(10);
         }
         else
         {
