@@ -226,10 +226,10 @@ public class Animal extends Living {
      * @return Legs * 10 + (energy-strength)
      */
     public double getWeight() {
-        if (energy - strength > 0)
-            return (legs * 10 + (energy-strength));
-        else
-            return (legs * 10);
+       // if (energy - strength > 0)
+       //     return (legs * 10 + (energy-strength));
+       // else
+            return (legs * 2);
     }
     
     /** Returns the calculated speed of the animal.

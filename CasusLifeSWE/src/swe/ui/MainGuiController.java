@@ -40,7 +40,7 @@ public class MainGuiController implements Initializable {
     @FXML private void handleButtonNewWorldAction(ActionEvent event) throws IOException 
     {
         ViewPane.getChildren().clear();
-        ViewPane.getChildren().add(FXMLLoader.load(getClass().getResource("WorldView.fxml")));
+        ViewPane.getChildren().add(FXMLLoader.load(getClass().getResource("Preset.fxml")));
     }
     
     /**

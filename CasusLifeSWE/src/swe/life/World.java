@@ -72,7 +72,7 @@ public final class World {
      * @param width The width of the world.
      * @param height The height of the world.
      */
-    private World(int width, int height) {
+    public World(int width, int height) {
         this.width = width;
         this.height = height;
         
